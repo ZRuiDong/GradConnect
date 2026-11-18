@@ -1,0 +1,7 @@
+<aside class="consultation-guidance" role="note" aria-label="{% if consultation_guidance == 'compose' %}提问说明{% else %}咨询前请先查阅{% endif %}">
+  <div class="consultation-guidance-icon" aria-hidden="true">!</div>
+  <div>{% if consultation_guidance == 'compose' %}
+    <p>提问时，请一次性说明<strong>问题背景、前因后果、已尝试的处理方式和需要解决的具体问题</strong>，便于管理员准确回复。</p>
+    {% else %}<p><strong>请先查阅 <a href="{% url 'notification_list' %}">通知汇总</a>、<a href="{% url 'guide_list' %}">办事指南（办事流程）</a>、<a href="{% url 'policy_list' %}">规章制度</a>和<a href="{% url 'faq_list' %}">官方问答</a>，未找到相关答案后再发起咨询。</strong></p>{% endif %}
+  </div>
+</aside>

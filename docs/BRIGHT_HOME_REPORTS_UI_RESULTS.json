@@ -1,0 +1,40 @@
+{
+  "method": "Independent temporary SQLite with 1500 QA students, real Chrome HTTP/CDP, native confirmations and Excel downloads",
+  "checks": [
+    "明亮首页在1440/390/320px保持指标、图表和入口，文字与配色正常",
+    "学生首页显示本人班级、党支部和全部当前有效职务，窄屏正常且无管理员入口",
+    "唯一超级管理员真实创建普通管理员、确认停用/启用及重置密码成功",
+    "普通管理员访问管理员管理被拒绝，日常业务入口仍正常",
+    "管理员从真实导出按钮下载Excel，打卡跨页导出超过千行，学生报表保留筛选、身份证文本和履职历史",
+    "学生可下载本人打卡报表，无法导出其他学生资料"
+  ],
+  "passed": 6,
+  "javascriptErrors": 0,
+  "screenshots": [
+    "outputs/bright-home-review-20261118/admin-home-desktop.png",
+    "outputs/bright-home-review-20261118/admin-home-charts.png",
+    "outputs/bright-home-review-20261118/admin-home-390.png",
+    "outputs/bright-home-review-20261118/student-home-desktop.png",
+    "outputs/bright-home-review-20261118/student-campus-card.png",
+    "outputs/bright-home-review-20261118/student-card-390.png",
+    "outputs/bright-home-review-20261118/student-card-320.png",
+    "outputs/bright-home-review-20261118/manager-list-desktop.png",
+    "outputs/bright-home-review-20261118/manager-list-390.png"
+  ],
+  "isolated_database_verified": true,
+  "workspace_database_modified": false,
+  "export_benchmarks": [
+    {
+      "report": "月度打卡",
+      "rows": 36640,
+      "seconds": 15.092,
+      "bytes": 3068888
+    },
+    {
+      "report": "学生信息",
+      "rows": 1500,
+      "seconds": 1.086,
+      "bytes": 223890
+    }
+  ]
+}

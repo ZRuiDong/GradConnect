@@ -1,0 +1,24 @@
+{
+  "exists": true,
+  "version": 1,
+  "as_of": "2026-11-17",
+  "students": 1500,
+  "counts": {
+    "students": 1500,
+    "admins": 3,
+    "cadre_tenures": 2076,
+    "notifications": 126,
+    "guides": 128,
+    "policies": 48,
+    "policy_revisions": 72,
+    "videos": 18,
+    "leaves": 1522,
+    "internships": 506,
+    "rentals": 506,
+    "conversations": 160,
+    "messages": 400,
+    "faqs": 192,
+    "monthly_attendance": 36615
+  },
+  "media_prefix": "qa_seed/v1/"
+}

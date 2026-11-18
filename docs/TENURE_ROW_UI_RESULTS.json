@@ -1,0 +1,27 @@
+{
+  "method": "Isolated Django SQLite database and real HTTP in Chrome headless CDP; native confirmation dialogs, actual fetch/save/delete/create flows",
+  "checks": [
+    "修改后显示保存/取消；三个字段与操作在同一行，取消保存确认不发请求",
+    "确认后单条真实保存并更新编辑版本，未提交的基本信息保留在输入框",
+    "取消修改恢复之前的履职值",
+    "日期错误不弹保存确认、不发请求；有效新增立即保存且空结束日期默认为2999年",
+    "删除先确认，取消不发请求；确认后该记录从界面和数据库移除",
+    "窄屏保持单行并在履职区域横向滚动，整页不被撑宽",
+    "单条操作后可继续保存学生基本资料，最新版本与整表数据一致",
+    "详情页修改直达相应记录；详情页删除也先确认并刷新当前职务/历史",
+    "期间已有变更时提示重新核对，旧编辑页不能继续覆盖保存",
+    "新账号履职逐条确认暂存，删除可取消，删除后序号重排且可继续修改保存",
+    "创建账号时一并保存已确认履职，默认结束日期及修改结果正确"
+  ],
+  "passed": 11,
+  "confirmationDialogs": 13,
+  "httpPostRequests": 8,
+  "screenshots": [
+    "outputs/tenure-review-20261117/desktop-editing.png",
+    "outputs/tenure-review-20261117/desktop-saved.png",
+    "outputs/tenure-review-20261117/narrow-390.png",
+    "outputs/tenure-review-20261117/new-account-drafts.png"
+  ],
+  "isolated_database_verified": true,
+  "workspace_database_modified": false
+}

@@ -1,0 +1,5 @@
+<nav class="tabs application-tabs" aria-label="请销假、实习和租房子模块">
+  <a class="{% if active_subnav == 'leave' %}selected{% endif %}" href="{% url 'leave_list' %}"{% if active_subnav == 'leave' %} aria-current="page"{% endif %}>日常请销假</a>
+  <a class="{% if active_subnav == 'internship' %}selected{% endif %}" href="{% url 'internship_list' %}"{% if active_subnav == 'internship' %} aria-current="page"{% endif %}>实习登记</a>
+  <a class="{% if active_subnav == 'rental' %}selected{% endif %}" href="{% url 'rental_list' %}"{% if active_subnav == 'rental' %} aria-current="page"{% endif %}>校外租房</a>
+</nav>

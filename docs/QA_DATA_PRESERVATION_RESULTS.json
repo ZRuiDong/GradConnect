@@ -1,0 +1,7 @@
+{
+  "backup": "backups/gradconnect-20261117-113854-327408.tar.gz",
+  "existing_rows_preserved": 70,
+  "existing_tables_checked": 27,
+  "integrity": "ok",
+  "foreign_keys": "ok"
+}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}首页{% endblock %}
+{% block content %}
+<div class="home-page home-grouped">
+  <div class="home-heading"><div><p class="eyebrow">CAMPUS SERVICE OVERVIEW</p><h1>首页 <span>／ {{ user.display_name }}，你好</span></h1></div><div class="home-date"><span>{{ today|date:'Y年n月j日' }}</span><small>数据实时更新</small></div></div>
+  <div class="home-welcome home-welcome-compact"><div><span class="home-welcome-label">GRADCONNECT · {% if user.is_staff %}管理与服务{% else %}我的校园{% endif %}</span><h2>信息有归处，事务有进展。</h2></div><div class="button-group"><a class="button" href="{% if user.is_staff %}{% url 'consultation_list' %}?waiting=1{% else %}{% url 'notification_list' %}{% endif %}">{% if user.is_staff %}处理待回复咨询{% else %}查阅通知{% endif %} ↗</a><a class="home-light-link" href="{% url 'guide_list' %}">办事指南 →</a></div></div>
+  {% if not user.is_staff %}
+  <section class="home-student-profile" aria-label="我的组织与任职"><div class="home-profile-title"><span>{{ user.display_name|first }}</span><div><h2>我的校园名片</h2><p>{{ user.display_name }} · {{ user.username }}</p></div></div><div class="home-profile-item"><span>所在班级</span><strong>{{ user.student_class|default:'尚未填写' }}</strong></div><div class="home-profile-item"><span>所属党支部</span><strong>{{ user.party_branch|default:'未填写 / 暂无' }}</strong></div><div class="home-profile-item home-profile-roles"><span>当前干部职务</span><div>{% for role in student_roles %}<strong>{{ role.position }}</strong>{% empty %}<strong class="no-role">暂无当前任职</strong>{% endfor %}</div></div></section>
+  {% endif %}
+
+  <section class="panel home-module home-consultation" data-home-module="consultation" aria-labelledby="home-consultation-title">
+    <div class="home-module-heading"><div><span class="home-module-icon" aria-hidden="true">◌</span><h2 id="home-consultation-title">{% if user.is_staff %}咨询服务{% else %}我的咨询{% endif %}</h2></div><a href="{% url 'consultation_list' %}">查看咨询 ↗</a></div>
+    <div class="home-consultation-grid">
+      <div class="home-consultation-summary">
+        <div class="home-consult-metrics">{% for card in consultation_cards %}<a class="home-kpi tone-{{ card.tone }}" href="{{ card.url }}"><span class="home-kpi-label">{{ card.label }}</span><strong>{{ card.value }}</strong></a>{% endfor %}</div>
+        <div class="home-consult-trend"><div class="home-small-heading"><h3>近六个月咨询趋势</h3><div class="home-trend-key"><span><i></i>咨询数</span><span><i></i>已获回复</span></div></div><div class="home-trend-plot"><span class="home-trend-maximum">{{ trend_maximum }}</span><span class="home-trend-zero">0</span>{% for row in consultation_trend %}<div class="home-trend-month" title="{{ row.label }}：咨询{{ row.total }}个，已获回复{{ row.answered }}个"><div class="home-trend-bars" aria-hidden="true"><span class="trend-total" style="height:{{ row.height }}%"></span><span class="trend-answered" style="height:{{ row.answered_height }}%"></span></div><span class="home-trend-month-label">{{ row.short_label }}</span><span class="home-trend-values" aria-hidden="true"><b>{{ row.total }}</b><i>/</i><b>{{ row.answered }}</b></span></div>{% endfor %}</div><ul class="sr-only">{% for row in consultation_trend %}<li>{{ row.label }}：咨询{{ row.total }}个，已获回复{{ row.answered }}个</li>{% endfor %}</ul></div>
+      </div>
+      <div class="home-consultation-distribution"><div class="home-small-heading"><h3>{% if user.is_staff %}咨询类别分布{% else %}我的咨询类别{% endif %}</h3><span>共 {{ consultation_distribution.total }} 个会话</span></div><div class="home-donut-layout"><div class="home-donut" style="background:{{ consultation_distribution.gradient }}" role="img" aria-label="咨询类别占比，详细数据见图例"><div><strong>{{ consultation_distribution.total }}</strong><span>咨询会话</span></div></div><ul class="home-chart-legend">{% for row in consultation_distribution.rows %}<li><span class="legend-dot" style="background:{{ row.color }}"></span><span>{{ row.label }}</span><strong>{{ row.count }}</strong><small>{{ row.percentage }}%</small></li>{% endfor %}</ul></div></div>
+    </div>
+    {% if recent_consultations %}<div class="home-recent-consultations"><span>最近咨询</span>{% for item in recent_consultations|slice:':2' %}<a href="{% url 'consultation_detail' item.pk %}" title="{{ item.subject }}"><span>{{ item.subject }}</span><small>{% if item.awaiting_reply %}待回复{% else %}已回复{% endif %}</small></a>{% endfor %}</div>{% endif %}
+    <p class="home-module-note">{% if user.is_staff %}统计全部会话；{% else %}仅统计本人会话；{% endif %}回复率按至少收到一次教师回复的会话计算，继续追问仍计入已获回复。</p>
+  </section>
+
+  <div class="home-module-grid">
+    <section class="panel home-module home-content-visits" data-home-module="clicks" aria-labelledby="home-clicks-title">
+      <div class="home-module-heading"><div><span class="home-module-icon" aria-hidden="true">↗</span><h2 id="home-clicks-title">{% if user.is_staff %}内容访问{% else %}我的内容访问{% endif %}</h2></div><span>五类内容点击</span></div>
+      <div class="home-click-totals"><div><span>本月点击量</span><strong>{{ click_metrics.month }}</strong></div><div><span>今日点击量</span><strong>{{ click_metrics.today }}</strong></div></div>
+      <div class="home-click-breakdown" role="table" aria-label="按内容类型汇总点击量"><div class="home-click-breakdown-head" role="row"><span role="columnheader">内容类型</span><span role="columnheader">总点击</span><span role="columnheader">本月</span><span role="columnheader">今日</span></div>{% for row in click_breakdown %}<div class="home-click-breakdown-row" role="row"><span role="cell"><a href="{{ row.url }}">{{ row.label }}</a></span><strong role="cell">{{ row.total }}</strong><span role="cell">{{ row.month }}</span><span role="cell">{{ row.today }}</span></div>{% endfor %}</div>
+      <p class="home-module-note">{% if not user.is_staff %}仅统计本人；{% endif %}每次打开详情页均计一次，短时间重复访问也累计。</p>
+    </section>
+
+    <section class="panel home-module home-applications" data-home-module="applications" aria-labelledby="home-applications-title">
+      <div class="home-module-heading"><div><span class="home-module-icon" aria-hidden="true">▤</span><h2 id="home-applications-title">{% if user.is_staff %}事务办理{% else %}我的办理进度{% endif %}</h2></div><a href="{% url 'leave_list' %}">进入办理 ↗</a></div>
+      <div class="home-task-grid">{% for task in home_tasks %}<a href="{{ task.url }}"><span>{{ task.label }}</span><strong>{{ task.count }}</strong><i>↗</i></a>{% endfor %}</div>
+      <a class="home-student-summary" href="{{ student_summary_card.url }}"><span>{{ student_summary_card.label }}</span><strong>{{ student_summary_card.value }}</strong><small>{{ student_summary_card.hint }}</small><i>↗</i></a>
+      <p class="home-module-note">{% if user.is_staff %}待办统计全部学生的申请，点击对应数字继续处理。{% else %}仅展示本人申请状态，点击对应事项查看详情。{% endif %}</p>
+    </section>
+
+    <section class="panel home-module home-information" data-home-module="information" aria-labelledby="home-information-title">
+      <div class="home-module-heading"><div><span class="home-module-icon" aria-hidden="true">◷</span><h2 id="home-information-title">通知与制度</h2></div><a href="{% url 'notification_list' %}">全部通知 ↗</a></div>
+      <div class="home-inventory-metrics">{% for card in inventory_cards %}<a href="{{ card.url }}"><span>{{ card.label }}</span><strong>{{ card.value }}</strong></a>{% endfor %}</div>
+      <div class="home-small-heading"><h3>通知类别占比</h3><span>按已发布数量统计</span></div><div class="home-stacked-bar" role="img" aria-label="已发布通知类别占比，详细数据见下方图例">{% for row in notification_distribution.rows %}{% if row.count %}<span style="width:{{ row.width }}%;background:{{ row.color }}" title="{{ row.label }}：{{ row.count }}条（{{ row.percentage }}%）"></span>{% endif %}{% endfor %}</div><ul class="home-chart-legend notification-legend">{% for row in notification_distribution.rows %}<li><span class="legend-dot" style="background:{{ row.color }}"></span><span>{{ row.label }}</span><strong>{{ row.count }}</strong><small>{{ row.percentage }}%</small></li>{% endfor %}</ul>
+      {% if recent_notifications %}<div class="home-mini-list"><h3>优先关注</h3>{% for item in recent_notifications|slice:':2' %}<a href="{% url 'notification_detail' item.pk %}" title="{{ item.title }}"><strong>{{ item.title }}</strong><small>{{ item.updated_at|date:'m-d' }}</small></a>{% endfor %}</div>{% endif %}
+    </section>
+
+    <section class="panel home-module home-guides" data-home-module="guides" aria-labelledby="home-guides-title">
+      <div class="home-module-heading"><div><span class="home-module-icon" aria-hidden="true">≋</span><h2 id="home-guides-title">办事指南</h2></div><a href="{% url 'guide_list' %}">查看流程 ↗</a></div>
+      <div class="home-guide-list">{% for item in recent_guides %}<a href="{% url 'guide_detail' item.pk %}"><span class="row-icon" aria-hidden="true">≋</span><div><strong title="{{ item.title }}">{{ item.title }}</strong><small title="{{ item.owner }} · {{ item.office }}">{{ item.owner }} · {{ item.office }}</small></div><span class="arrow">↗</span></a>{% empty %}<div class="empty-inline">暂无已发布的办事指南。</div>{% endfor %}</div>
+      <div class="home-guide-links"><a href="{% url 'faq_list' %}">? 查阅官方问答 ↗</a><a href="{% url 'video_list' %}">▷ 学习视频 ↗</a></div>
+    </section>
+  </div>
+
+  <div class="home-shortcuts"><span>常用服务</span><a href="{% url 'leave_list' %}">请销假</a><a href="{% url 'internship_list' %}">实习登记</a><a href="{% url 'rental_list' %}">校外租房</a><a href="{% url 'attendance_list' %}">月度打卡</a>{% if user.is_staff %}<a href="{% url 'account_list' %}">学生信息汇总</a>{% else %}<a href="{% url 'consultation_list' %}">咨询回复</a>{% endif %}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}{{ title }}{% endblock %}{% block content %}
+<a class="back-link" href="{% url 'account_list' %}">← 学生信息汇总</a>
+<div class="page-heading"><div><p class="eyebrow">STUDENT INFORMATION</p><h1>{{ title }}</h1><p>上传名单后先预览核对，确认后处理整个批次。</p></div></div>
+<section class="panel form-panel">
+  <div class="notice info"><a href="{% url 'roster_template' kind %}">下载Excel模板</a>。{% if kind == 'graduate' %}填写“学号、姓名”，仅将名单中的在校学生改为毕业；已毕业学生不重复修改。毕业状态不会自动停用账号或删除业务记录。{% else %}填写“学号、姓名、任职职务、开始日期、结束日期”。结束日期可留空，默认2999-12-31；日期使用YYYY-MM-DD。相同学生、职务和开始日期的记录会更新结束日期，其他情况新增历史记录。{% endif %}</div>
+  {% if kind == 'tenure' %}<p class="muted">任职时间包含今天（含首尾日期）的职务自动显示在当前履职职务中。可以为同一学生填写多条不同职务，每人最多100条历史。</p>{% endif %}
+  <form method="post" enctype="multipart/form-data" data-upload-form data-student-import>{% csrf_token %}{% include 'partials/fields.html' %}<div class="form-actions"><button class="button">校验并预览</button><a class="button secondary" href="{% url 'account_list' %}">取消</a><span class="upload-hint muted" hidden>正在校验名单，请稍候…</span></div></form>
+</section>{% endblock %}

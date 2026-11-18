@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}确认月度打卡导入{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'attendance_upload' %}">← 重新上传</a><div class="page-heading"><div><p class="eyebrow">IMPORT PREVIEW</p><h1>确认月度打卡导入</h1><p>{% if batch.month %}{{ batch.month|date:'Y年m月' }}{% else %}多个月份{% endif %} · 共 {{ batch.row_count }} 条，每页预览 {{ per_page }} 条。</p></div></div>
+{% if batch.is_confirmed %}<div class="notice success">该批次已导入完成，请勿重复提交。</div>
+{% else %}
+{% if batch.format_version != 2 %}<div class="notice error">这是旧版每日打卡预览，不能再确认导入。请取消后使用新的月度模板上传。</div>
+{% elif expired %}<div class="notice error">预览已超过一天，请重新上传。</div>
+{% else %}<div class="notice info">确认后，同一学号、同一月份的已有记录会被更新，其他学生和月份保留。总天数＝打卡天数＋请假天数；确认会导入整个批次，不受预览分页限制。</div>
+{% include 'partials/sort_error.html' %}<section class="panel table-panel"><div class="table-wrap"><table><thead><tr>{% include 'partials/sort_th.html' with column=sort_fields.username %}{% include 'partials/sort_th.html' with column=sort_fields.name %}{% include 'partials/sort_th.html' with column=sort_fields.month %}{% include 'partials/sort_th.html' with column=sort_fields.clock_days %}{% include 'partials/sort_th.html' with column=sort_fields.leave_days %}{% include 'partials/sort_th.html' with column=sort_fields.total_days %}</tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.username }}</td><td>{{ row.name }}</td><td>{{ row.month }}</td><td>{{ row.clock_days }}</td><td>{{ row.leave_days }}</td><td>{{ row.total_days }}</td></tr>{% endfor %}</tbody></table></div></section>
+{% include 'partials/pagination.html' %}
+{% endif %}
+<form method="post" class="form-actions">{% csrf_token %}{% if batch.format_version == 2 and not expired %}<button class="button" name="action" value="confirm">确认导入全部 {{ batch.row_count }} 条</button>{% endif %}<button class="button secondary" name="action" value="cancel">取消导入</button></form>
+{% endif %}
+{% endblock %}

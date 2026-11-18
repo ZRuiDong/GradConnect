@@ -1,0 +1,9 @@
+{
+  "backup": "备份完成：/Users/mirzn/webProject/GradConnect/backups/gradconnect-20261117-163254-797393.tar.gz",
+  "business_tables_checked": 27,
+  "existing_rows_preserved": 53015,
+  "all_existing_fields_unchanged": true,
+  "integrity": "ok",
+  "foreign_keys": "ok",
+  "migration": "0011_content_display_order"
+}

@@ -1,0 +1,39 @@
+{% load static %}<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}首页{% endblock %} · GradConnect</title><link rel="stylesheet" href="{% static 'app.css' %}{% if debug_asset_version %}?v={{ debug_asset_version }}{% endif %}"><script defer src="{% static 'app.js' %}{% if debug_asset_version %}?v={{ debug_asset_version }}{% endif %}"></script></head>
+<body data-nav-role="{% if user.is_staff %}admin{% else %}student{% endif %}"{% if user.is_authenticated %}{% if user.is_staff %} data-presence-url="{% url 'account_presence' %}"{% else %} data-activity-url="{% url 'activity_ping' %}"{% endif %}{% endif %}>
+<a class="skip" href="#main">跳转到主要内容</a>
+<aside class="sidebar">
+  <a class="brand" href="{% url 'dashboard' %}"><span class="brand-mark">G<span>↗</span></span><span>GradConnect<small>研究生事务与服务</small></span></a>
+  <div class="workspace-label">{% if user.is_staff %}管理空间{% else %}学生空间{% endif %}<span class="live-dot"></span></div>
+  <nav aria-label="主导航">
+    <a class="{% if active_nav == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><span>◈</span>首页</a>
+    <a class="{% if active_nav == 'notification' %}active{% endif %}" href="{% url 'notification_list' %}"><span>◷</span>通知汇总</a>
+    <a class="{% if active_nav == 'guide' %}active{% endif %}" href="{% url 'guide_list' %}"><span>≋</span>办事指南</a>
+    <details class="nav-group" aria-label="请销假、实习和租房" data-nav-group="applications" data-current-group="{% if active_nav == 'applications' %}true{% else %}false{% endif %}"{% if active_nav == 'applications' %} open{% endif %}>
+      <summary class="nav-parent{% if active_nav == 'applications' %} active{% endif %}" aria-controls="nav-applications"><span aria-hidden="true">↗</span>请销假、实习和租房<svg class="nav-caret" width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></summary>
+      <div class="subnav" id="nav-applications"><a class="{% if active_subnav == 'leave' %}active{% endif %}" href="{% url 'leave_list' %}"{% if active_subnav == 'leave' %} aria-current="page"{% endif %}>日常请销假</a><a class="{% if active_subnav == 'internship' %}active{% endif %}" href="{% url 'internship_list' %}"{% if active_subnav == 'internship' %} aria-current="page"{% endif %}>实习登记</a><a class="{% if active_subnav == 'rental' %}active{% endif %}" href="{% url 'rental_list' %}"{% if active_subnav == 'rental' %} aria-current="page"{% endif %}>校外租房</a></div>
+    </details>
+    <details class="nav-group" aria-label="咨询回复" data-nav-group="support" data-current-group="{% if active_nav == 'support' %}true{% else %}false{% endif %}"{% if active_nav == 'support' %} open{% endif %}>
+      <summary class="nav-parent{% if active_nav == 'support' %} active{% endif %}" aria-controls="nav-support"><span aria-hidden="true">◌</span>咨询回复<svg class="nav-caret" width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></summary>
+      <div class="subnav" id="nav-support"><a class="{% if active_subnav == 'faq' %}active{% endif %}" href="{% url 'faq_list' %}"{% if active_subnav == 'faq' %} aria-current="page"{% endif %}>官方问答</a><a class="{% if active_subnav == 'consultation' %}active{% endif %}" href="{% url 'consultation_list' %}"{% if active_subnav == 'consultation' %} aria-current="page"{% endif %}>咨询回复</a></div>
+    </details>
+    <a class="{% if active_nav == 'attendance' %}active{% endif %}" href="{% url 'attendance_list' %}"><span>▦</span>月度打卡</a>
+    {% if user.is_staff %}<a class="{% if active_nav == 'account' %}active{% endif %}" href="{% url 'account_list' %}"><span>◎</span>学生信息汇总</a>{% endif %}
+    <a class="{% if active_nav == 'policy' %}active{% endif %}" href="{% url 'policy_list' %}"><span>▤</span>规章制度</a>
+    <a class="{% if active_nav == 'video' %}active{% endif %}" href="{% url 'video_list' %}"><span>▷</span>学习视频</a>
+    {% if user.is_staff %}<div class="nav-caption">系统管理</div>{% if user.is_superuser %}<a class="{% if active_nav == 'manager' %}active{% endif %}" href="{% url 'manager_list' %}"><span>♢</span>管理员管理</a>{% endif %}<a class="{% if active_nav == 'audit' %}active{% endif %}" href="{% url 'audit_list' %}"><span>⌁</span>操作记录</a>{% endif %}
+  </nav>
+  <div class="sidebar-note"><span>让事务更清晰</span><p>信息有归处，办理有进展。</p></div>
+</aside>
+<div class="shell">
+  <header class="topbar"><span class="breadcrumb">研究生事务服务平台 <span>/</span> {% if user.is_staff %}管理端{% else %}学生端{% endif %}</span><div class="user-menu">{% if not user.password_change_required %}<a class="inbox-link" href="{% url 'inbox_list' %}" data-inbox-count-url="{% url 'inbox_count' %}" aria-label="消息中心，{{ inbox_unread_count }}条未读消息">消息<span class="inbox-count" data-inbox-count{% if not inbox_unread_count %} hidden{% endif %}>{{ inbox_unread_count }}</span></a>{% endif %}<span class="avatar">{{ user.display_name|first }}</span><span title="{{ user.display_name }}">{{ user.display_name }}<small title="{{ user.username }}">{% if user.is_superuser %}超级管理员{% elif user.is_staff %}管理员{% else %}{{ user.username }}{% endif %}</small></span><a href="{% url 'password_change' %}">修改密码</a><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="text-button" type="submit">退出</button></form></div></header>
+  <main id="main">
+    {% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<div class="notice {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>GradConnect <span>·</span> 研究生事务，一站连接 <span class="footer-right">{% if user.is_staff %}管理与服务{% else %}学习与成长{% endif %}</span></footer>
+</div>
+{% include 'partials/support_watermark.html' %}
+{% if inbox_topic %}<form hidden data-inbox-topic-read method="post" action="{% url 'inbox_read_topic' %}">{% csrf_token %}<input name="kind" value="{{ inbox_topic.kind }}"><input name="object_id" value="{{ inbox_topic.object_id }}"><input name="cutoff" value="{{ inbox_topic.cutoff }}"></form>{% endif %}
+</body></html>

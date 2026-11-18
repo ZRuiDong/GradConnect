@@ -1,0 +1,10 @@
+{
+  "backup": "/Users/mirzn/webProject/GradConnect/backups/gradconnect-20261118-084157-429048.tar.gz",
+  "migration": "0012_student_activity_content_visits",
+  "business_tables_checked": 27,
+  "existing_rows_preserved": 53022,
+  "all_existing_fields_unchanged": true,
+  "new_metrics_backfilled": false,
+  "integrity": "ok",
+  "foreign_keys": "ok"
+}

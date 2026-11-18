@@ -1,0 +1,16 @@
+<details class="filter-dropdown" data-filter-dropdown data-label="{{ filter_label }}" data-placeholder="{{ placeholder }}">
+  <summary id="{{ widget.attrs.id }}" aria-controls="{{ widget.attrs.id }}_panel" aria-label="{{ filter_label }}，{{ selection_text }}">
+    <span data-selection-text class="{% if selection_count %}has-selection{% endif %}">{{ selection_text }}</span>
+    <span class="dropdown-count" data-selection-count{% if not selection_count %} hidden{% endif %}>{{ selection_count }}</span>
+    <svg class="dropdown-chevron" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true"><path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </summary>
+  <div class="filter-dropdown-panel" id="{{ widget.attrs.id }}_panel">
+    <label class="sr-only" for="{{ widget.attrs.id }}_search">搜索{{ filter_label }}选项</label>
+    <input id="{{ widget.attrs.id }}_search" type="search" class="dropdown-search" placeholder="搜索选项…" data-option-search autocomplete="off">
+    <div class="dropdown-options" role="group" aria-label="{{ filter_label }}选项">
+      {% for group, options, index in widget.optgroups %}{% for option in options %}{% include option.template_name with widget=option %}{% endfor %}{% endfor %}
+      <p class="dropdown-empty" data-options-empty{% if widget.optgroups %} hidden{% endif %}>暂无可选项</p>
+    </div>
+    <div class="dropdown-actions"><span>可勾选多项</span><button type="button" data-clear-options>清空</button><button type="button" data-close-dropdown>完成</button></div>
+  </div>
+</details>

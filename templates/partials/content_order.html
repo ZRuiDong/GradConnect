@@ -1,0 +1,4 @@
+{% if item.order_controls %}<form method="post" action="{% url 'content_order' item.order_controls.kind item.pk %}" class="content-order-controls" aria-label="调整展示顺序">
+  {% csrf_token %}<input type="hidden" name="order_token" value="{{ item.order_controls.token }}"><input type="hidden" name="return_to" value="{{ request.get_full_path }}">
+  <span>第 {{ item.order_controls.position }} 位</span>{% for button in item.order_controls.buttons %}<button type="submit" name="move" value="{{ button.key }}"{% if not button.enabled %} disabled{% endif %}>{{ button.label }}</button>{% endfor %}
+</form>{% endif %}

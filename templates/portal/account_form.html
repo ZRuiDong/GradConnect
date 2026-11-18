@@ -1,0 +1,16 @@
+{% extends 'base.html' %}{% block title %}{{ title }}{% endblock %}{% block content %}
+<a class="back-link" href="{% url 'account_list' %}">← 学生信息汇总</a><div class="page-heading"><div><p class="eyebrow">STUDENT INFORMATION</p><h1>{{ title }}</h1><p>姓名、学号、身份证号、在校状态、所在班级必填；所在党支部、政治面貌、院系和干部履职记录选填。</p></div></div>
+<form method="post" class="panel student-form" data-student-form>{% csrf_token %}
+  {% if not is_new %}<input type="hidden" name="edit_token" value="{{ edit_token }}">{% endif %}
+  {% if edit_conflict %}<div class="notice error" role="alert">请先重新加载并核对其他管理员已保存的资料。<a href="{% url 'account_edit' item.pk %}">重新加载最新资料 ↗</a></div>{% endif %}
+  <h2>学生基本信息</h2><div class="student-fields">{% include 'partials/fields.html' %}</div>
+  <section class="tenure-section" data-tenure-manager data-new-student="{% if is_new %}true{% else %}false{% endif %}"{% if not is_new %} data-action-url="{% url 'account_tenure_action' item.pk %}"{% endif %}>
+    <div class="panel-heading"><h2>干部履职历史（选填）</h2><button class="button secondary" type="button" data-add-tenure>＋ 添加履职记录</button></div>
+    <p class="tenure-help">开始日期≤今天≤结束日期的职务会显示为当前职务；结束日期留空默认为2999-12-31。{% if is_new %}逐条确认后，随学生账号一起创建。{% else %}履职记录逐条保存，学生基本信息在下方单独保存。{% endif %}</p>
+    <div class="tenure-feedback" data-tenure-feedback role="status" aria-live="polite" hidden></div>
+    <div data-tenure-content>{% include 'partials/tenure_rows.html' %}</div>
+    <p class="tenure-scroll-tip">可左右滑动查看日期与操作按钮。</p>
+    <noscript><p class="notice info">请启用浏览器 JavaScript 使用履职记录的新增、修改和删除操作。</p></noscript>
+  </section>
+  <div class="form-actions"><button class="button" type="submit"{% if edit_conflict %} disabled{% endif %}>{% if is_new %}创建学生账号及资料{% else %}保存学生基本信息{% endif %}</button><a class="button secondary" href="{% url 'account_list' %}">取消</a></div>
+</form>{% endblock %}

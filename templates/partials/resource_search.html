@@ -1,0 +1,6 @@
+<form class="searchbar" method="get" role="search">{% include 'partials/preserve_page_size.html' %}
+  <input type="hidden" name="category" value="{{ filter_form.category.value|default:'' }}">
+  <label class="sr-only" for="{{ filter_form.q.id_for_label }}">{{ filter_form.q.label }}</label><span aria-hidden="true">⌕</span>{{ filter_form.q }}
+  <button type="submit" class="button secondary small">查询</button>{% if q %}<a href="{{ request.path }}{% if selected_category %}?category={{ selected_category }}{% endif %}" class="muted">清除关键词</a>{% endif %}
+</form>
+{% if filter_form.errors %}<div class="notice error" role="alert">筛选条件有误，请选择有效类别并检查关键词。{{ filter_form.q.errors }}{{ filter_form.category.errors }}</div>{% endif %}

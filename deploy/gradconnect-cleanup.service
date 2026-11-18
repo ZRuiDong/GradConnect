@@ -1,0 +1,10 @@
+[Unit]
+Description=Clean expired GradConnect sessions and import previews
+
+[Service]
+Type=oneshot
+User=gradconnect
+Group=www-data
+WorkingDirectory=/srv/gradconnect
+EnvironmentFile=/srv/gradconnect/.env
+ExecStart=/srv/gradconnect/.venv/bin/python manage.py cleanup_data

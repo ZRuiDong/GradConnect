@@ -1,0 +1,30 @@
+{
+  "method": "Isolated Django SQLite / real Chrome HTTP and CSRF / file uploads / native confirm dialogs",
+  "checks": [
+    "首次登录被引导设置新密码，桌面及390/320px页面可用",
+    "真实表单修改临时密码成功，当前会话保留并进入首页",
+    "学生消息中心显示未读数量、分类筛选和分页，1440/390/320px无整页溢出",
+    "查看消息跳转到本人咨询，并清除该消息的未读状态",
+    "学生追问通知管理员，管理员甲已读后管理员乙仍保留自己的未读状态",
+    "撤回操作显示二次确认，取消后申请继续待审核",
+    "撤回后原字段及附件自动带入，修改后新建申请并保留原记录",
+    "原申请可回看撤回历史，新申请可下载沿用附件",
+    "重新提交的申请可审核，结果进入学生消息，已通过申请无撤回入口",
+    "租房驳回后可修改重提，宿舍选项正确回填，支持真实替换附件上传",
+    "管理员重置使旧会话失效，临时密码登录后再次强制改密，改密后恢复使用"
+  ],
+  "passed": 11,
+  "javascriptErrors": 0,
+  "newInternship": 3,
+  "newRental": 4,
+  "screenshots": [
+    "outputs/priority-features-20261118/forced-password-390.png",
+    "outputs/priority-features-20261118/student-inbox-desktop.png",
+    "outputs/priority-features-20261118/student-inbox-390.png",
+    "outputs/priority-features-20261118/pending-internship.png",
+    "outputs/priority-features-20261118/internship-correction-390.png"
+  ],
+  "workspace_database_modified": false,
+  "detail_auto_read_verified": true,
+  "isolated_database_verified": true
+}

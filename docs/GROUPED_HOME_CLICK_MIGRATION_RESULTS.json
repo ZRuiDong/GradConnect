@@ -1,0 +1,10 @@
+{
+  "backup": "/Users/mirzn/webProject/GradConnect/backups/gradconnect-20261118-092932-323581.tar.gz",
+  "migration": "0014_notification_click_metrics",
+  "tables_checked": 29,
+  "existing_rows_preserved": 53029,
+  "all_existing_fields_unchanged": true,
+  "historical_clicks_preserved": true,
+  "integrity": "ok",
+  "foreign_keys": "ok"
+}

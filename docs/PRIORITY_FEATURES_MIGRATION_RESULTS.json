@@ -1,0 +1,127 @@
+{
+  "migration": "0015_inbox_password_registration_corrections",
+  "backup": "/Users/mirzn/webProject/GradConnect/backups/gradconnect-20261118-140245-520191.tar.gz",
+  "old_tables_checked": 29,
+  "old_rows_checked": 53031,
+  "old_columns_and_password_hashes_unchanged": true,
+  "first_login_flags": 1498,
+  "historical_messages_not_backfilled": true,
+  "tables": {
+    "portal_attendance": {
+      "rows": 20,
+      "sha256": "4fda722db6b725932d371982ac7b2a9b96c13d97abfc83455207ea322aae7866"
+    },
+    "portal_attendancebatch": {
+      "rows": 5,
+      "sha256": "bf09221f136168591d8f3d42f932a0ed5d28b766b2ef50226baf89e8dd5bc6f7"
+    },
+    "portal_audit": {
+      "rows": 1551,
+      "sha256": "d730300eba74be8b0019a0a201e7a4a95d36fd460c1d5d4dbc57b4aff580e556"
+    },
+    "portal_cadretenure": {
+      "rows": 2076,
+      "sha256": "380f840735719f05cf22388fbb305d3fd57533a59da83115da29319ef9c01b9a"
+    },
+    "portal_contentvisitdaily": {
+      "rows": 6,
+      "sha256": "bd792343f61984f23f3b54240e3b16f478720fe19882f1de93c9c9fb04217dac"
+    },
+    "portal_conversation": {
+      "rows": 162,
+      "sha256": "2ba9280d567b5bf60a0a792273fda722fc17b0f7d2172822adfb5ded54cf7e69"
+    },
+    "portal_faq": {
+      "rows": 196,
+      "sha256": "2b64eff69f9dfb0ae55c8f41e356d5f027e24f7631de76c48e5768dbb4a057bd"
+    },
+    "portal_guideattachment": {
+      "rows": 301,
+      "sha256": "ab4511cfe37bab5261d65aa5e96c2701a0e777ed2a641f7578aa58d566425ad6"
+    },
+    "portal_leave": {
+      "rows": 1524,
+      "sha256": "23a1568ee633b5df0fc8708b91267a4d44bb7c6168203687b1f226594abe14ef"
+    },
+    "portal_leaveevent": {
+      "rows": 3037,
+      "sha256": "4fe159681284b9375bd1fd290551518d8a4377029b3f3823ecf2a16da4241674"
+    },
+    "portal_loginguard": {
+      "rows": 3,
+      "sha256": "4f54a6c735ef30355079c0732b8116b8dbef8fb1fb50bc15ee6e0caae48e8bde"
+    },
+    "portal_matter": {
+      "rows": 1,
+      "sha256": "bb47ab9755caa7b34cce8438e3bff1aadf8fc33e07b1275e3f16e16893ff3477"
+    },
+    "portal_matterupdate": {
+      "rows": 1,
+      "sha256": "85bf4045377f6dcc1d312ef90ed8e9bb6fa379fe0cb0804cd1f8fc41c2b5e1a6"
+    },
+    "portal_message": {
+      "rows": 404,
+      "sha256": "dfe31246c557144dbf9a6c786c6624a8a73c8b3fdeb3c5c057c22fa67550a2cf"
+    },
+    "portal_monthlyattendance": {
+      "rows": 36617,
+      "sha256": "6c55273208040d280eee35993027798f768e871ecec21621d72f2404c524f56b"
+    },
+    "portal_notification": {
+      "rows": 128,
+      "sha256": "a72ed7ac071d9ff28801ab7cd044574f4249cfafa5d669c2239d0ce28c720303"
+    },
+    "portal_policy": {
+      "rows": 51,
+      "sha256": "8f2ed7195b03b2883f8c558c96549bf653ae12ff520381a4e66dfaa1237c2264"
+    },
+    "portal_policyrevision": {
+      "rows": 76,
+      "sha256": "3fe6783e29dd06c84984d59ece8f7207e236b1c7d72338829616ebc52c330dc5"
+    },
+    "portal_registration": {
+      "rows": 1012,
+      "sha256": "20b921e6263ace60abd52c59ef35beca81cb0961c2de108c4f12e587db3a5dd4"
+    },
+    "portal_registrationattachment": {
+      "rows": 1012,
+      "sha256": "c7fd4702df4add3a296f1be6db55edb4a17ac420287bfddb7703536fcc5d5f62"
+    },
+    "portal_registrationevent": {
+      "rows": 1686,
+      "sha256": "8e78c926ce96eeff40d831a8968445d39782767da412fac5c0598b5aa0bcf4b7"
+    },
+    "portal_serviceguide": {
+      "rows": 129,
+      "sha256": "f0635a174727d310d89ce2ccd802ead4300d76930ea78b06c58cc024c349c4de"
+    },
+    "portal_studentdailyactivity": {
+      "rows": 1,
+      "sha256": "dc27e2a787002e76a32fa1fe50d2107fd92c386f85829c7dd0fe37d2d82e7430"
+    },
+    "portal_studentimportbatch": {
+      "rows": 3,
+      "sha256": "b5251fa7e945cf00c1a0b59c0c9dc5e3ea14c862567382b0d24959922b11e1a2"
+    },
+    "portal_studentrosterbatch": {
+      "rows": 2,
+      "sha256": "2d08bffa7691227d61dca55543878c18ffc738983e590c584d1141553017d707"
+    },
+    "portal_user": {
+      "rows": 1506,
+      "sha256": "4a9853dcc54128e11f95f373066a7e23c65e5ed64439f0addf0e0ebd59af0a9e"
+    },
+    "portal_user_groups": {
+      "rows": 1503,
+      "sha256": "91f32819e8dbf6e881c282451426ed8b12983fb31bcd917943faf79d26d66489"
+    },
+    "portal_user_user_permissions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "portal_video": {
+      "rows": 18,
+      "sha256": "ed061b18d26f91261c1412fbd24a82cd704e85ab841d9881d85d80b71ffc862d"
+    }
+  }
+}

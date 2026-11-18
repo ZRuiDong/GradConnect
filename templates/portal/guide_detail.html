@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}{{ item.title }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'guide_list' %}?category={{ item.category }}">← {{ item.get_category_display }}指南</a>
+<div class="page-heading"><div><p class="eyebrow">{{ item.get_category_display }}</p><h1>{{ item.title }}</h1><p>更新于 {{ item.updated_at|date:'Y-m-d H:i' }}{% if user.is_staff %}　{% include 'partials/status.html' %}{% endif %}</p></div>
+{% if user.is_staff %}<div class="button-group"><a class="button secondary" href="{% url 'guide_edit' item.pk %}">修改 / 替换指南</a>{% if item.status == 'published' %}<form method="post" action="{% url 'guide_action' item.pk 'withdraw' %}" data-confirm="撤下后学生无法查看该指南及附件，确认撤下？">{% csrf_token %}<button class="button danger">撤下指南</button></form>{% else %}<form method="post" action="{% url 'guide_action' item.pk 'publish' %}">{% csrf_token %}<button class="button">重新发布</button></form>{% endif %}</div>{% endif %}</div>
+{% if item.status == 'withdrawn' %}<div class="notice info">该指南已撤下，仅管理员可见。修改后不会自动重新发布，请核对后点击“重新发布”。</div>{% endif %}
+<div class="content-metrics-panel">{% include 'partials/content_metrics.html' with metrics=content_metrics %}<span>学生点击统计</span></div><article class="panel article">
+  <h2>办理信息</h2><dl class="detail-list"><dt>负责人</dt><dd>{{ item.owner }}</dd><dt>联系方式</dt><dd>{{ item.contact }}</dd><dt>办公地址</dt><dd>{{ item.office }}</dd></dl>
+  <h2>办理流程</h2><div class="prose">{{ item.process|linebreaks }}</div>
+  {% if attachments %}<section class="guide-attachments"><h2>附件与表单</h2>{% for attachment in attachments %}<div class="attachment-bar"><div class="attachment-name"><strong>{{ attachment.original_name }}</strong><small>{{ attachment.extension|cut:'.'|upper }}</small></div><div class="button-group">{% if attachment.is_pdf %}<a class="button secondary small" href="{% url 'guide_file' item.pk attachment.pk %}" target="_blank" rel="noopener">在线预览 ↗</a>{% endif %}<a class="button secondary small" href="{% url 'guide_file' item.pk attachment.pk %}?download=1">下载附件 ↓</a></div></div>{% endfor %}</section>{% endif %}
+</article>
+{% endblock %}

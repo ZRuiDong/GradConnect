@@ -1,0 +1,37 @@
+{
+  "method": "Isolated Django SQLite and real Chrome HTTP/CDP, repeated GET detail visits in immediate succession",
+  "checks": [
+    "首页恢复绿色系，五组数据独立成模块，咨询三项指标、分类图与趋势同组，1440/390/320px无整页溢出",
+    "学生首页保留组织与当前职务名片，咨询和点击合计只统计本人",
+    "notification每次打开与刷新详情都累计，管理员浏览不累计，列表同步总/月/今日统计",
+    "faq每次打开与刷新详情都累计，管理员浏览不累计，列表同步总/月/今日统计",
+    "policy每次打开与刷新详情都累计，管理员浏览不累计，列表同步总/月/今日统计",
+    "guide每次打开与刷新详情都累计，管理员浏览不累计，列表同步总/月/今日统计",
+    "video每次打开与刷新详情都累计，管理员浏览不累计，列表同步总/月/今日统计",
+    "五类点击分项之和与两端首页总数一致，并同步到学生月度活跃详情",
+    "撤下通知对学生继续不可见，拒绝访问及管理员查看不新增点击"
+  ],
+  "passed": 9,
+  "javascriptErrors": 0,
+  "geometry": {
+    "desktop": 1789,
+    "mobile320": 3051
+  },
+  "screenshots": [
+    "outputs/grouped-home-review-20261118/admin-home-desktop.png",
+    "outputs/grouped-home-review-20261118/consultation-group-desktop.png",
+    "outputs/grouped-home-review-20261118/lower-groups-desktop.png",
+    "outputs/grouped-home-review-20261118/admin-home-390.png",
+    "outputs/grouped-home-review-20261118/consultation-group-390.png",
+    "outputs/grouped-home-review-20261118/consultation-group-320.png",
+    "outputs/grouped-home-review-20261118/student-home-desktop.png",
+    "outputs/grouped-home-review-20261118/student-home-390.png",
+    "outputs/grouped-home-review-20261118/notification-counts-detail.png",
+    "outputs/grouped-home-review-20261118/notification-counts-list.png",
+    "outputs/grouped-home-review-20261118/student-click-breakdown.png",
+    "outputs/grouped-home-review-20261118/admin-click-breakdown.png",
+    "outputs/grouped-home-review-20261118/five-kind-activity.png"
+  ],
+  "isolated_database_verified": true,
+  "workspace_database_modified": false
+}

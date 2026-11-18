@@ -1,0 +1,3 @@
+【测试】纯文本附件
+所有信息均为虚构。
+QA@example.invalid

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}{{ module_title }}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">STUDENT APPLICATIONS</p><h1>请销假、实习和租房</h1><p>{% if user.is_staff %}审核学生申请，查询申请信息与办理记录。{% else %}提交申请，查询审核结果。申请及附件仅本人和管理员可见。{% endif %}</p></div>{% if not user.is_staff %}<a class="button" href="{% url create_name %}">＋ 提交{{ module_title }}</a>{% endif %}</div>
+{% include 'partials/application_tabs.html' %}
+<h2>{{ module_title }}</h2>
+<form class="filterbar leave-filters" method="get">{% include 'partials/preserve_page_size.html' %}{% for field in filter_form %}<div class="filter-field{% if field.name == 'q' %} keyword-field{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>{% endfor %}<div class="button-group"><button class="button" type="submit">筛选</button><a class="button secondary" href="{% url list_name %}">重置</a></div></form>
+<p class="filter-help muted">按起止时间与所选日期的交集筛选，结束日期包含当天。共 {{ page_obj.paginator.count }} 条。</p>
+{% include 'partials/sort_error.html' %}<section class="panel table-panel"><div class="table-wrap"><table><thead><tr>{% include 'partials/sort_th.html' with column=sort_fields.id %}{% include 'partials/sort_th_pair.html' with first=sort_fields.name second=sort_fields.number %}{% if kind == 'internship' %}{% include 'partials/sort_th.html' with column=sort_fields.employer %}{% else %}{% include 'partials/sort_th.html' with column=sort_fields.rental_reason %}{% endif %}{% include 'partials/sort_th_pair.html' with first=sort_fields.starts_at second=sort_fields.ends_at %}{% include 'partials/sort_th.html' with column=sort_fields.status %}<th>操作</th></tr></thead><tbody>
+{% for item in page_obj %}<tr><td>#{{ item.pk }}</td><td>{{ item.student_name }}<small>{{ item.student_number }}</small></td><td>{% if kind == 'internship' %}{{ item.employer }}{% else %}{{ item.get_rental_reason_display }}{% endif %}</td><td>{{ item.starts_at|date:'Y-m-d H:i' }}<small>至 {{ item.ends_at|date:'Y-m-d H:i' }}</small></td><td>{% include 'partials/status.html' %}</td><td><a href="{% url detail_name item.pk %}">查看详情 ↗</a></td></tr>{% empty %}<tr><td colspan="6" class="empty-inline">暂无符合条件的申请。</td></tr>{% endfor %}
+</tbody></table></div></section>{% include 'partials/pagination.html' %}
+{% endblock %}

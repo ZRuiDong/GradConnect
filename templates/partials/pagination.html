@@ -1,0 +1,19 @@
+<nav class="pagination" aria-label="分页">
+  <div class="pagination-summary">共 <strong>{{ page_obj.paginator.count }}</strong> 条 <span>第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 页</span></div>
+  <ul class="pagination-links">
+    <li class="page-item">{% if page_obj.has_previous %}<a class="page-link" href="?{{ querystring }}&page={{ page_obj.previous_page_number }}" aria-label="上一页">‹</a>{% else %}<span class="page-link disabled" aria-disabled="true" aria-label="上一页">‹</span>{% endif %}</li>
+    {% for link in page_links %}<li class="page-item">{% if link.ellipsis %}<span class="page-ellipsis">…</span>{% elif link.current %}<span class="page-link current" aria-current="page">{{ link.number }}</span>{% else %}<a class="page-link" href="{{ link.url }}" aria-label="第 {{ link.number }} 页">{{ link.number }}</a>{% endif %}</li>{% endfor %}
+    <li class="page-item">{% if page_obj.has_next %}<a class="page-link" href="?{{ querystring }}&page={{ page_obj.next_page_number }}" aria-label="下一页">›</a>{% else %}<span class="page-link disabled" aria-disabled="true" aria-label="下一页">›</span>{% endif %}</li>
+  </ul>
+  <div class="pagination-controls">
+    <form method="get" class="pagination-size" data-page-size-form>
+      {% for name, value in pagination_filters %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}<input type="hidden" name="page" value="1">
+      <label for="page-size">每页</label><select id="page-size" class="form-select pagination-page-size" name="per_page" data-page-size-select aria-label="每页条数">{% for size in page_size_options %}<option value="{{ size }}"{% if size == per_page %} selected{% endif %}>{{ size }} 条</option>{% endfor %}<option value="custom" data-page-size-custom-option hidden>自定义…</option></select>
+      <span class="pagination-custom-size" data-page-size-custom hidden><label class="sr-only" for="page-size-custom">自定义每页条数（1至100）</label><input id="page-size-custom" type="text" name="per_page" inputmode="numeric" pattern="([1-9]|[1-9][0-9]|100)" maxlength="3" value="{{ per_page }}" title="请输入1至100的整数" autocomplete="off" disabled><span>条</span></span><button class="button secondary small" type="submit">应用</button>
+    </form>
+    <form method="get" class="pagination-jump">
+      {% for name, value in pagination_filters %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}<input type="hidden" name="per_page" value="{{ per_page }}">
+      <label for="page-jump">到第</label><input id="page-jump" name="page" type="number" min="1" max="{{ page_obj.paginator.num_pages }}" step="1" value="{{ page_obj.number }}" inputmode="numeric" aria-label="跳转页码"><span>页</span><button class="button secondary small" type="submit">跳转</button>
+    </form>
+  </div>
+</nav>

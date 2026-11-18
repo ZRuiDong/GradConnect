@@ -1,0 +1,30 @@
+{
+  "method": "Isolated Django SQLite database, real Chrome HTTP/CDP and trusted input; test-only fixtures never written to workspace business database",
+  "checks": [
+    "四类内容详情显示总量/月度/今日，管理员浏览不增加学生点击量",
+    "学生真实点击即时累计到详情和列表，重复刷新一分钟内去重，四类内容独立计数",
+    "首页月度与今日点击量与明细一致，390/320px无整页溢出",
+    "姓名后绿/灰/红状态与在线、离线、毕业和停用一致，后台轮询可实时更新圆点，简洁表头保留",
+    "学生详情的活跃率、四类点击和活跃日历正常，历史月份可查询，桌面/390/320px无溢出",
+    "四个内容列表加入统计后保持原有布局、内容调序和窄屏展示",
+    "可见页面实际交互触发带CSRF的节流活跃上报，后台停留不会自动维持在线",
+    "学生退出登录后圆点转为离线，历史活跃时间保留"
+  ],
+  "passed": 8,
+  "javascriptErrors": 0,
+  "screenshots": [
+    "outputs/analytics-review-20261118/admin-home-clicks.png",
+    "outputs/analytics-review-20261118/student-home-clicks.png",
+    "outputs/analytics-review-20261118/home-clicks-390.png",
+    "outputs/analytics-review-20261118/student-presence-table.png",
+    "outputs/analytics-review-20261118/activity-desktop.png",
+    "outputs/analytics-review-20261118/activity-390.png",
+    "outputs/analytics-review-20261118/activity-320.png",
+    "outputs/analytics-review-20261118/guide-counts.png",
+    "outputs/analytics-review-20261118/policy-counts.png",
+    "outputs/analytics-review-20261118/faq-counts.png",
+    "outputs/analytics-review-20261118/video-counts.png"
+  ],
+  "isolated_database_verified": true,
+  "workspace_database_modified": false
+}

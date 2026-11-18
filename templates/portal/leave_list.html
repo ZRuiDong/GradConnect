@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}请销假、实习和租房{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">LEAVE MANAGEMENT</p><h1>请销假、实习和租房</h1><p>{% if user.is_staff %}审核请假申请，确认线下销假结果。{% else %}提交申请、查询审核结果，查看完整办理记录。{% endif %}</p></div>
+  {% if user.is_staff %}<button class="button" type="submit" form="leave-filter-form" formaction="{% url 'leave_export' %}">↓ 导出筛选结果</button>{% else %}<a class="button" href="{% url 'leave_create' %}">＋ 提交请假</a>{% endif %}
+</div>
+{% include 'partials/application_tabs.html' %}<h2>日常请销假</h2>
+{% if filter_form.errors %}<div class="notice error" role="alert">筛选条件有误，请修正后重新查询或导出。</div>{% endif %}
+<form id="leave-filter-form" method="get" action="{% url 'leave_list' %}" class="filterbar leave-filters">{% include 'partials/preserve_page_size.html' %}
+  {% for field in filter_form %}<div class="filter-field {% if field.name == 'q' %}keyword-field{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>{% endfor %}
+  <div class="button-group"><button class="button secondary" type="submit">筛选</button><a href="{% url 'leave_list' %}" class="muted">重置</a></div>
+</form>
+<p class="filter-help muted">按请假起止时间筛选：与所选日期范围有交集的申请均会显示，结束日期包含当天（北京时间）。可只填写一个日期。共 {{ page_obj.paginator.count }} 条{% if user.is_staff %}，导出包含全部符合条件的记录{% endif %}。</p>
+{% include 'partials/sort_error.html' %}<section class="panel table-panel"><div class="table-wrap"><table>
+  <thead><tr>{% include 'partials/sort_th.html' with column=sort_fields.id %}{% if user.is_staff %}{% include 'partials/sort_th_pair.html' with first=sort_fields.name second=sort_fields.number %}{% endif %}{% include 'partials/sort_th.html' with column=sort_fields.kind %}{% include 'partials/sort_th_pair.html' with first=sort_fields.starts_at second=sort_fields.ends_at %}{% include 'partials/sort_th.html' with column=sort_fields.status %}<th>操作</th></tr></thead>
+  <tbody>{% for item in page_obj %}<tr><td class="mono">#{{ item.pk|stringformat:'04d' }}</td>{% if user.is_staff %}<td>{{ item.student_name|default:item.student.display_name }}<small>{{ item.student_number|default:item.student.username }}</small></td>{% endif %}<td>{{ item.get_kind_display }}</td><td>{{ item.starts_at|date:'Y-m-d H:i' }}<small>至 {{ item.ends_at|date:'Y-m-d H:i' }}</small></td><td>{% include 'partials/status.html' %}</td><td><a href="{% url 'leave_detail' item.pk %}">查看详情 ↗</a></td></tr>{% empty %}<tr><td colspan="6" class="empty-inline">暂无符合条件的请假申请。</td></tr>{% endfor %}</tbody>
+</table></div></section>
+{% include 'partials/pagination.html' %}
+{% endblock %}

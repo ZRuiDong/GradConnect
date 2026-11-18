@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}{{ module_title }} #{{ item.pk }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url list_name %}">← {{ module_title }}</a>
+{% include 'partials/application_tabs.html' %}
+<div class="page-heading"><div><p class="eyebrow">APPLICATION #{{ item.pk }}</p><h1>{{ module_title }}</h1><p>{{ item.student_name }} · {{ item.student_number }}　{% include 'partials/status.html' %}</p></div></div>
+{% if item.previous_id %}<div class="notice info">本申请由 <a href="{% url detail_name item.previous_id %}">原申请 #{{ item.previous_id }}</a> 修改后重新提交，原记录和审核意见保留。</div>{% endif %}
+{% if replacement %}<div class="notice info">此申请已重新提交，请查看 <a href="{% url detail_name replacement.pk %}">新申请 #{{ replacement.pk }}</a>。</div>{% elif not user.is_staff %}{% if item.status == 'withdrawn' or item.status == 'rejected' %}<div class="registration-correction notice info"><span>{% if item.status == 'rejected' %}请根据驳回意见修改后重新提交。{% else %}申请已撤回，可以修改信息及附件后重新提交。{% endif %}原申请历史保留。</span><a class="button" href="{% url resubmit_name item.pk %}">修改并重新提交</a></div>{% endif %}{% endif %}
+{% if not user.is_staff and item.status == 'pending' %}<form class="registration-withdraw" method="post" action="{% url withdraw_name item.pk %}" data-confirm="确认撤回这份申请？撤回后管理员将不能审核，你可以修改后重新提交。">{% csrf_token %}<input type="hidden" name="confirmed" value="yes"><span class="muted">如信息填写有误，可在管理员审核前撤回修改。</span><button class="button secondary" type="submit">撤回并修改</button></form>{% endif %}
+<div class="detail-grid"><section class="panel article"><h2>申请信息</h2><dl class="detail-list">
+  <dt>姓名</dt><dd>{{ item.student_name }}</dd><dt>学号</dt><dd>{{ item.student_number }}</dd>
+  <dt>开始时间</dt><dd>{{ item.starts_at|date:'Y-m-d H:i' }}</dd><dt>结束时间</dt><dd>{{ item.ends_at|date:'Y-m-d H:i' }}</dd>
+  {% if kind == 'internship' %}<dt>实习单位</dt><dd>{{ item.employer }}</dd><dt>实习岗位</dt><dd>{{ item.position }}</dd>{% else %}<dt>租房原因</dt><dd>{{ item.get_rental_reason_display }}{% if item.reason_detail %}<div class="prose">{{ item.reason_detail|linebreaks }}</div>{% endif %}</dd>{% endif %}
+  <dt>{% if kind == 'internship' %}实习地址{% else %}租房详细地址{% endif %}</dt><dd>{{ item.address }}</dd>
+  <dt>本人联系方式</dt><dd>{{ item.contact }}</dd><dt>紧急联系人</dt><dd>{{ item.emergency_name }}</dd><dt>紧急联系方式</dt><dd>{{ item.emergency_contact }}</dd>
+  {% if kind == 'rental' %}<dt>是否有校内宿舍</dt><dd>{{ item.has_dorm|yesno:'是,否,未填写' }}</dd>{% if item.has_dorm %}<dt>校内宿舍号</dt><dd>{{ item.dorm_number }}</dd>{% endif %}{% endif %}
+  <dt>提交时间</dt><dd>{{ item.created_at|date:'Y-m-d H:i' }}</dd>
+</dl><h3>申请附件</h3>{% for attachment in attachments %}<div class="attachment-bar"><strong class="attachment-name">{{ attachment.original_name }}</strong><a class="button secondary" href="{% url file_name item.pk attachment.pk %}">下载附件 ↓</a></div>{% endfor %}
+{% if user.is_staff and item.status == 'pending' %}<form class="action-form" method="post" action="{% url review_name item.pk %}">{% csrf_token %}{{ review_form.non_field_errors }}<label for="{{ review_form.note.id_for_label }}">审核意见（驳回原因必填）</label>{{ review_form.note }}{{ review_form.note.errors }}{{ review_form.action.errors }}<div class="form-actions"><button class="button" name="action" value="approve">通过申请</button><button class="button danger" name="action" value="reject">驳回申请</button></div></form>{% endif %}
+</section><aside class="panel article"><h2>办理记录</h2><div class="timeline">{% for event in events %}<div class="timeline-item"><span class="timeline-dot"></span><strong>{{ event.get_status_display }}</strong><small>{{ event.created_at|date:'Y-m-d H:i' }} · {{ event.actor.display_name }}</small>{% if event.note %}<p>{{ event.note|linebreaksbr }}</p>{% endif %}</div>{% endfor %}</div></aside></div>
+{% endblock %}

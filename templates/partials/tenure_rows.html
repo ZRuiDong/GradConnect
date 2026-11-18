@@ -1,0 +1,9 @@
+{{ tenure_formset.management_form }}{{ tenure_formset.non_form_errors }}
+<div class="tenure-scroll" tabindex="0" role="region" aria-label="干部履职记录，窄屏可横向滚动">
+  <div class="tenure-table">
+    <div class="tenure-table-head">{% include 'partials/tenure_sort_heading.html' with key='position' label='任职职务' %}{% include 'partials/tenure_sort_heading.html' with key='starts_on' label='开始日期' %}{% include 'partials/tenure_sort_heading.html' with key='ends_on' label='结束日期' %}<span>操作</span></div>
+    <div id="tenure-rows">{% for cadre_form in tenure_formset %}{% include 'partials/tenure_fields.html' %}{% endfor %}</div>
+  </div>
+</div>
+<p class="tenure-empty" data-tenure-empty{% if tenure_formset.total_form_count %} hidden{% endif %}>暂无干部履职记录，点击“添加履职记录”即可新增。</p>
+<template id="tenure-empty-form">{% include 'partials/tenure_fields.html' with cadre_form=tenure_formset.empty_form %}</template>

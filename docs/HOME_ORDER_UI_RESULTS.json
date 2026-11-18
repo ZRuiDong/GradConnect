@@ -1,0 +1,34 @@
+{
+  "method": "Isolated Django SQLite database and real Chrome HTTP/CDP, native form POSTs and real responsive viewport",
+  "checks": [
+    "管理员首页六项真实指标、八类咨询和七类通知图例、六个月趋势正常展示",
+    "首页在390和320像素无整页横向溢出",
+    "办事指南蓝色目录布局、类别与搜索筛选及窄屏滚动正常",
+    "notification置顶经真实POST保存，学生端顺序同步且不显示管理按钮",
+    "guide置顶经真实POST保存，学生端顺序同步且不显示管理按钮",
+    "policy置顶经真实POST保存，学生端顺序同步且不显示管理按钮",
+    "faq置顶经真实POST保存，学生端顺序同步且不显示管理按钮",
+    "video置顶经真实POST保存，学生端顺序同步且不显示管理按钮",
+    "学生首页只统计本人；师生气泡颜色、身份标签不同，水印及追问入口保留",
+    "学生信息姓名三角支持服务端跨页排序，保持每页条数和列宽拖动控件",
+    "请假三角排序保留筛选和分页，下一页延续全局顺序",
+    "履职编辑区三角排序保留字段名称和输入值，正在编辑时阻止重新排序"
+  ],
+  "passed": 12,
+  "javascriptErrors": 0,
+  "screenshots": [
+    "outputs/home-order-review-20261117/admin-home-desktop.png",
+    "outputs/home-order-review-20261117/admin-home-charts.png",
+    "outputs/home-order-review-20261117/admin-home-trend.png",
+    "outputs/home-order-review-20261117/admin-home-390.png",
+    "outputs/home-order-review-20261117/admin-home-trend-390.png",
+    "outputs/home-order-review-20261117/guide-desktop.png",
+    "outputs/home-order-review-20261117/guide-390.png",
+    "outputs/home-order-review-20261117/student-home-desktop.png",
+    "outputs/home-order-review-20261117/chat-desktop.png",
+    "outputs/home-order-review-20261117/chat-390.png",
+    "outputs/home-order-review-20261117/student-table-sort.png"
+  ],
+  "isolated_database_verified": true,
+  "workspace_database_modified": false
+}

@@ -1,0 +1,113 @@
+{
+  "method": "Chrome headless CDP, local rendered QA HTML with application CSS/JS; real pointer input and desktop/narrow viewport checks",
+  "checks": [
+    {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "horizontalOverflow": false,
+      "tableWidth": 1428,
+      "wrapperWidth": 1116,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": true,
+      "pointerResize": true,
+      "page": "students",
+      "screenshot": "outputs/ui-review-20261117/students-1440.png"
+    },
+    {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "horizontalOverflow": false,
+      "tableWidth": 1428,
+      "wrapperWidth": 1116,
+      "ellipsis": true,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": true,
+      "pointerResize": true,
+      "page": "student-long",
+      "screenshot": "outputs/ui-review-20261117/student-long-1440.png"
+    },
+    {
+      "viewport": 390,
+      "documentWidth": 390,
+      "horizontalOverflow": false,
+      "tableWidth": 1428,
+      "wrapperWidth": 348,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": true,
+      "pointerResize": true,
+      "page": "students",
+      "screenshot": "outputs/ui-review-20261117/students-390.png"
+    },
+    {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "horizontalOverflow": false,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": null,
+      "page": "attendance",
+      "screenshot": "outputs/ui-review-20261117/attendance-1440.png"
+    },
+    {
+      "viewport": 390,
+      "documentWidth": 390,
+      "horizontalOverflow": false,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": null,
+      "page": "attendance",
+      "screenshot": "outputs/ui-review-20261117/attendance-390.png"
+    },
+    {
+      "viewport": 390,
+      "documentWidth": 390,
+      "horizontalOverflow": false,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": null,
+      "page": "student-notices",
+      "screenshot": "outputs/ui-review-20261117/student-notices-390.png"
+    },
+    {
+      "viewport": 390,
+      "documentWidth": 390,
+      "horizontalOverflow": false,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": null,
+      "page": "student-leave",
+      "screenshot": "outputs/ui-review-20261117/student-leave-390.png"
+    },
+    {
+      "viewport": 320,
+      "documentWidth": 320,
+      "horizontalOverflow": false,
+      "tableWidth": 1428,
+      "wrapperWidth": 278,
+      "ellipsis": false,
+      "controlHeights": [
+        44
+      ],
+      "keyboardResize": true,
+      "pointerResize": true,
+      "page": "students",
+      "screenshot": "outputs/ui-review-20261117/students-320.png"
+    }
+  ]
+}

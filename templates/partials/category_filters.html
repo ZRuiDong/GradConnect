@@ -1,0 +1,5 @@
+<nav class="category-filters{% if extra_class %} {{ extra_class }}{% endif %}" aria-label="{{ category_label|default:'类别筛选' }}">
+  {% for tab in category_tabs %}
+    <a class="category-chip{% if tab.active %} selected{% endif %}" href="{{ tab.url }}"{% if tab.active %} aria-current="page"{% endif %}>{{ tab.label }}</a>
+  {% endfor %}
+</nav>

@@ -1,0 +1,117 @@
+{
+  "date": "2026-11-17T14:41:49.782901+08:00",
+  "backup": "/Users/mirzn/webProject/GradConnect/backups/gradconnect-20261117-144149-408938.tar.gz",
+  "updated": {
+    "users": 3,
+    "leaves": 9,
+    "registrations": 8,
+    "monthly_attendance": 75
+  },
+  "non_qa_accounts_preserved": true,
+  "manual_names_preserved": true,
+  "other_user_fields_preserved": true,
+  "other_business_fields_preserved": true,
+  "idempotency_verified": true,
+  "rendered_pages_verified": [
+    {
+      "student": "qa000015",
+      "path": "/accounts/",
+      "status": 200
+    },
+    {
+      "student": "qa000015",
+      "path": "/leaves/",
+      "status": 200
+    },
+    {
+      "student": "qa000015",
+      "path": "/internships/",
+      "status": 200
+    },
+    {
+      "student": "qa000015",
+      "path": "/rentals/",
+      "status": 200
+    },
+    {
+      "student": "qa000015",
+      "path": "/attendance/",
+      "status": 200
+    },
+    {
+      "student": "qa000016",
+      "path": "/accounts/",
+      "status": 200
+    },
+    {
+      "student": "qa000016",
+      "path": "/leaves/",
+      "status": 200
+    },
+    {
+      "student": "qa000016",
+      "path": "/internships/",
+      "status": 200
+    },
+    {
+      "student": "qa000016",
+      "path": "/rentals/",
+      "status": 200
+    },
+    {
+      "student": "qa000016",
+      "path": "/attendance/",
+      "status": 200
+    },
+    {
+      "student": "qa000018",
+      "path": "/accounts/",
+      "status": 200
+    },
+    {
+      "student": "qa000018",
+      "path": "/leaves/",
+      "status": 200
+    },
+    {
+      "student": "qa000018",
+      "path": "/internships/",
+      "status": 200
+    },
+    {
+      "student": "qa000018",
+      "path": "/rentals/",
+      "status": 200
+    },
+    {
+      "student": "qa000018",
+      "path": "/attendance/",
+      "status": 200
+    },
+    {
+      "student": "qa000019",
+      "path": "/accounts/",
+      "status": 200
+    },
+    {
+      "student": "qa000019",
+      "path": "/leaves/",
+      "status": 200
+    },
+    {
+      "student": "qa000019",
+      "path": "/internships/",
+      "status": 200
+    },
+    {
+      "student": "qa000019",
+      "path": "/rentals/",
+      "status": 200
+    },
+    {
+      "student": "qa000019",
+      "path": "/attendance/",
+      "status": 200
+    }
+  ]
+}

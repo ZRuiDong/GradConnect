@@ -1,0 +1,24 @@
+[Unit]
+Description=GradConnect Django application
+After=network.target postgresql.service
+
+[Service]
+User=gradconnect
+Group=www-data
+WorkingDirectory=/srv/gradconnect
+EnvironmentFile=/srv/gradconnect/.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/srv/gradconnect/.venv/bin/gunicorn --config deploy/gunicorn.conf.py gradconnect.wsgi:application
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=620
+UMask=0027
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/gradconnect/media /srv/gradconnect/backups
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}通知汇总{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">CAMPUS NOTIFICATIONS</p><h1>通知汇总</h1><p>按类别查阅校园通知，及时获取与你有关的信息。</p></div>{% if user.is_staff %}<a class="button" href="{% url 'notification_create' %}{% if selected_category %}?category={{ selected_category }}{% endif %}">＋ 发布通知</a>{% endif %}</div>
+{% include 'partials/category_filters.html' with category_label='通知类别' %}
+{% if filter_form.errors %}<div class="notice error" role="alert">筛选条件有误，请选择有效类别或修改搜索内容。{{ filter_form.category.errors }}{{ filter_form.q.errors }}{{ filter_form.status.errors }}</div>{% endif %}
+<form method="get" class="filterbar" role="search">{% include 'partials/preserve_page_size.html' %}
+  <input type="hidden" name="category" value="{{ request.GET.category|default:'' }}">
+  <label class="sr-only" for="{{ filter_form.q.id_for_label }}">搜索通知标题、摘要或正文</label>{{ filter_form.q }}
+  {% if user.is_staff %}<label class="sr-only" for="{{ filter_form.status.id_for_label }}">发布状态</label>{{ filter_form.status }}{% endif %}
+  <button class="button secondary" type="submit">搜索</button><a href="{% url 'notification_list' %}" class="muted">重置</a>
+</form>
+<p class="filter-help muted">共 {{ page_obj.paginator.count }} 条通知，按管理员设置的展示顺序排列。{% if user.is_staff %}已撤下通知仅管理员可见。{% endif %}</p>
+{% include 'partials/content_order_help.html' %}<div class="card-grid">{% for item in page_obj %}
+  <div class="resource-sort-item" id="resource-item-{{ item.pk }}"><a class="panel content-card" href="{% url 'notification_detail' item.pk %}">
+    <div class="card-top"><span class="file-icon">◷</span>{% if user.is_staff %}{% include 'partials/status.html' %}{% endif %}</div>
+    <span class="category">{{ item.get_category_display }}</span><h2>{{ item.title }}</h2>
+    <p>{{ item.summary|default:item.body|default:'点击查看通知详情及附件。'|truncatechars:110 }}</p>
+    {% include 'partials/content_metrics.html' with metrics=item.content_metrics %}<div class="card-bottom"><small>{{ item.updated_at|date:'Y-m-d' }}{% if item.attachment %} · 含附件{% endif %}</small><span>查看通知 ↗</span></div>
+  </a>{% include 'partials/content_order.html' %}</div>
+{% empty %}<div class="panel empty-state wide"><span class="empty-symbol">◷</span><h2>{% if q or selected_category %}暂无符合条件的通知{% else %}暂无通知{% endif %}</h2><p>{% if user.is_staff %}选择相应类别，发布第一条通知。{% else %}请尝试其他类别或关键词，已发布通知会展示在这里。{% endif %}</p></div>{% endfor %}</div>
+{% include 'partials/pagination.html' %}
+{% endblock %}

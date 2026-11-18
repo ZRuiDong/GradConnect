@@ -1,0 +1,81 @@
+{
+  "method": "Chrome headless CDP with locally rendered Django QA pages; screenshot and real DOM/FormData validation",
+  "checks": [
+    {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "selectTag": "SELECT",
+      "selectAppearance": "none",
+      "selectIcon": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23617467' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")",
+      "selectList": null,
+      "jumpAppearance": "textfield",
+      "spinnerRule": true,
+      "selected": "12",
+      "hasDatalist": false,
+      "pageSizeValues": [
+        "12"
+      ],
+      "customHidden": true,
+      "customValidation": true,
+      "singleSubmittedPageSize": true,
+      "screenshot": "outputs/pagination-review-20261117/pagination-1440-12.png"
+    },
+    {
+      "viewport": 390,
+      "documentWidth": 390,
+      "selectTag": "SELECT",
+      "selectAppearance": "none",
+      "selectIcon": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23617467' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")",
+      "selectList": null,
+      "jumpAppearance": "textfield",
+      "spinnerRule": true,
+      "selected": "12",
+      "hasDatalist": false,
+      "pageSizeValues": [
+        "12"
+      ],
+      "customHidden": true,
+      "customValidation": true,
+      "singleSubmittedPageSize": true,
+      "screenshot": "outputs/pagination-review-20261117/pagination-390-12.png"
+    },
+    {
+      "viewport": 320,
+      "documentWidth": 320,
+      "selectTag": "SELECT",
+      "selectAppearance": "none",
+      "selectIcon": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23617467' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")",
+      "selectList": null,
+      "jumpAppearance": "textfield",
+      "spinnerRule": true,
+      "selected": "12",
+      "hasDatalist": false,
+      "pageSizeValues": [
+        "12"
+      ],
+      "customHidden": true,
+      "customValidation": true,
+      "singleSubmittedPageSize": true,
+      "screenshot": "outputs/pagination-review-20261117/pagination-320-12.png"
+    },
+    {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "selectTag": "SELECT",
+      "selectAppearance": "none",
+      "selectIcon": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23617467' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")",
+      "selectList": null,
+      "jumpAppearance": "textfield",
+      "spinnerRule": true,
+      "selected": "37",
+      "hasDatalist": false,
+      "pageSizeValues": [
+        "37"
+      ],
+      "customHidden": true,
+      "customValidation": true,
+      "singleSubmittedPageSize": true,
+      "screenshot": "outputs/pagination-review-20261117/pagination-1440-37.png"
+    }
+  ]
+}

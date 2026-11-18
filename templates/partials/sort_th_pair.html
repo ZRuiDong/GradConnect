@@ -1,0 +1,1 @@
+<th scope="col" aria-sort="{% if first.active %}{{ first.aria_sort }}{% else %}{{ second.aria_sort }}{% endif %}"><div class="sort-heading-pair">{% include 'partials/sort_heading.html' with column=first %}{% include 'partials/sort_heading.html' with column=second %}</div></th>

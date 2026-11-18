@@ -1,0 +1,19 @@
+{
+  "backup": "备份完成：/Users/mirzn/webProject/GradConnect/backups/gradconnect-20261118-090646-193560.tar.gz",
+  "migration": "0013_unique_super_admin",
+  "tables_checked": 29,
+  "existing_rows_preserved": 53028,
+  "only_role_normalization_changes": [
+    {
+      "account": "qa_root",
+      "changed_fields": [
+        "is_superuser",
+        "session_revision"
+      ]
+    }
+  ],
+  "all_passwords_and_business_fields_unchanged": true,
+  "retained_super_admin": "admin",
+  "integrity": "ok",
+  "foreign_keys": "ok"
+}

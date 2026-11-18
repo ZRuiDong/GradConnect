@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-18",
+  "environment": "macOS / Python 3.13 / Django 5.2.19 / isolated SQLite",
+  "students": 1500,
+  "workspace_database_modified": false,
+  "workbook_contents_identical_except_export_timestamp": true,
+  "measurements": [
+    {
+      "implementation": "before",
+      "seconds": 7.477,
+      "query_count": 80,
+      "cadre_queries": 74,
+      "bytes": 3055580,
+      "sheet_rows": {
+        "报表汇总": 6,
+        "按月汇总": 25,
+        "月度打卡明细": 36640
+      },
+      "content_sha256_without_export_timestamp": "c8e760ca43ffa7aec88b7c561b0a597aae0b6af86a97f7ea37cf64016d3a0c11"
+    },
+    {
+      "implementation": "after",
+      "seconds": 7.236,
+      "query_count": 7,
+      "cadre_queries": 1,
+      "bytes": 3055577,
+      "sheet_rows": {
+        "报表汇总": 6,
+        "按月汇总": 25,
+        "月度打卡明细": 36640
+      },
+      "content_sha256_without_export_timestamp": "c8e760ca43ffa7aec88b7c561b0a597aae0b6af86a97f7ea37cf64016d3a0c11"
+    }
+  ],
+  "note": "Single local run; not a PostgreSQL or public-server concurrency capacity guarantee."
+}

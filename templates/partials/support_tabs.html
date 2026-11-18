@@ -1,0 +1,4 @@
+<nav class="tabs support-tabs" aria-label="咨询回复子模块">
+  <a class="{% if active_subnav == 'faq' %}selected{% endif %}" href="{% url 'faq_list' %}"{% if active_subnav == 'faq' %} aria-current="page"{% endif %}>官方问答</a>
+  <a class="{% if active_subnav == 'consultation' %}selected{% endif %}" href="{% url 'consultation_list' %}"{% if active_subnav == 'consultation' %} aria-current="page"{% endif %}>咨询回复</a>
+</nav>

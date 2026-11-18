@@ -1,0 +1,13 @@
+<section class="panel attendance-filter-card" aria-label="月度打卡筛选">
+  <form method="get">{% include 'partials/preserve_page_size.html' %}
+    {% for field in filter_form.hidden_fields %}{{ field }}{% endfor %}
+    <div class="attendance-filter-grid">
+      <fieldset class="attendance-range-field"><legend>月份范围</legend><div class="attendance-range-inputs"><label class="sr-only" for="{{ filter_form.month_from.id_for_label }}">起始年月</label>{{ filter_form.month_from }}<span>至</span><label class="sr-only" for="{{ filter_form.month_to.id_for_label }}">结束年月</label>{{ filter_form.month_to }}</div>{{ filter_form.month_from.errors }}{{ filter_form.month_to.errors }}</fieldset>
+      <div class="filter-control"><label class="filter-label" for="{{ filter_form.q.id_for_label }}">学生姓名 / 学号</label>{{ filter_form.q }}{{ filter_form.q.errors }}</div>
+      <div class="filter-control"><label class="filter-label" for="{{ filter_form.day_kind.id_for_label }}">天数类别</label>{{ filter_form.day_kind }}{{ filter_form.day_kind.errors }}</div>
+      <fieldset class="attendance-range-field"><legend>天数范围</legend><div class="attendance-range-inputs"><label class="sr-only" for="{{ filter_form.days_min.id_for_label }}">最少天数</label>{{ filter_form.days_min }}<span>至</span><label class="sr-only" for="{{ filter_form.days_max.id_for_label }}">最多天数</label>{{ filter_form.days_max }}<span class="range-unit">天</span></div>{{ filter_form.days_min.errors }}{{ filter_form.days_max.errors }}</fieldset>
+      <div class="button-group attendance-filter-actions"><button class="button" type="submit">查询记录</button><a class="filter-reset" href="{% url 'attendance_list' %}">重置</a></div>
+    </div>
+    <p class="attendance-filter-hint">范围包含首尾，任一端留空表示不限；天数填写 0–31 的整数，按单条月度记录筛选，不按区间累计。点击表头上下三角可升序或降序排列。</p>
+  </form>
+</section>
