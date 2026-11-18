@@ -41,8 +41,8 @@ class NotificationTests(TestCase):
     def reasons(self, response):
         return {item.title for item in response.context["page_obj"]}
 
-    def test_seven_categories_and_nav_immediately_below_dashboard(self):
-        labels = ["新生入学", "党建", "招聘信息", "评奖评优", "竞赛", "离校手续", "其他"]
+    def test_categories_and_nav_immediately_below_dashboard(self):
+        labels = ["新生入学", "党建", "招聘信息", "评奖评优", "竞赛", "文体活动", "离校手续", "其他"]
         self.assertEqual(list(Notification.Category.labels), labels)
         for user in [self.admin, self.student]:
             self.client.force_login(user)

@@ -38,7 +38,7 @@ class ComprehensiveDataTests(TestCase):
         self.assertTrue(created)
         self.assertEqual(report["counts"]["students"],60)
         self.assertEqual(report["counts"]["admins"],3)
-        self.assertEqual(report["counts"]["notifications"],126)
+        self.assertEqual(report["counts"]["notifications"],18 * len(Notification.Category))
         self.assertEqual(report["counts"]["guides"],128)
         self.assertEqual(report["counts"]["faqs"],192)
         self.assertEqual(set(Notification.objects.filter(created_by__username="qa_admin").values_list("category",flat=True)),set(Notification.Category.values))

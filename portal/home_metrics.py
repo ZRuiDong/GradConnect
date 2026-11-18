@@ -64,7 +64,7 @@ def home_context(user):
         {"label": "累计咨询" if staff else "我的咨询", "value": total["total"], "hint": "按咨询会话统计", "url": reverse("consultation_list"), "tone": "green", "symbol": "◌"},
         {"label": "回复率", "value": f"{rate:.1f}%" if total["total"] else "—", "hint": "至少获一次教师回复" if total["total"] else "暂无可统计咨询", "url": reverse("consultation_list"), "tone": "blue", "symbol": "↗"},
         {"label": "待回复咨询", "value": total["waiting"], "hint": "包含学生继续追问", "url": reverse("consultation_list")+"?waiting=1", "tone": "amber", "symbol": "◷"},
-        {"label": "已发布通知", "value": notification_count, "hint": "覆盖七类校园信息", "url": reverse("notification_list"), "tone": "coral", "symbol": "◎"},
+        {"label": "已发布通知", "value": notification_count, "hint": f"覆盖 {len(Notification.Category)} 类校园信息", "url": reverse("notification_list"), "tone": "coral", "symbol": "◎"},
         {"label": "有效规章制度", "value": policy_count, "hint": "已发布且具有有效版本", "url": reverse("policy_list"), "tone": "blue", "symbol": "▤"},
     ]
     if staff:

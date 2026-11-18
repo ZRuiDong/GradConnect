@@ -140,6 +140,7 @@ class Notification(Timestamped):
         RECRUITMENT = "recruitment", "招聘信息"
         AWARDS = "awards", "评奖评优"
         COMPETITION = "competition", "竞赛"
+        CULTURE_SPORTS = "culture_sports", "文体活动"
         DEPARTURE = "departure", "离校手续"
         OTHER = "other", "其他"
 
