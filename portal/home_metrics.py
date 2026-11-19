@@ -6,7 +6,7 @@ from django.utils import timezone
 from .models import ContentVisitDaily, Conversation, InquiryCategory, Leave, Message, MonthlyAttendance, Notification, Policy, Registration, ServiceGuide, User, Video
 
 
-COLORS = ["#28796a", "#699fba", "#dba560", "#839b62", "#ae88ad", "#5d87b0", "#cf8679", "#a5b4ac"]
+COLORS = ["#28796a", "#699fba", "#dba560", "#839b62", "#ae88ad", "#5d87b0", "#cf8679", "#a5b4ac", "#82734a"]
 
 
 def distribution(queryset, choices):

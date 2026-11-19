@@ -169,8 +169,8 @@ def parse_student_accounts(upload, mode="create"):
         # 兼容先前下载的九列模板，院系和所在班级始终是两个独立字段。
         headers = ["院系" if header == "院系/班级" else header for header in reader.fieldnames or []]
         reader.fieldnames = headers
-        if mode == "create" and headers != STUDENT_IMPORT_HEADERS:
-            raise ValidationError("表头必须依次为：" + "、".join(STUDENT_IMPORT_HEADERS) + "。请使用新的学生信息模板。")
+        if mode == "create" and headers not in (STUDENT_IMPORT_HEADERS, [h for h in STUDENT_IMPORT_HEADERS if h != "所在班级"]):
+            raise ValidationError("请使用学生信息模板的表头顺序，可省略“所在班级”列。")
         if mode == "update" and (len(set(headers)) != len(headers) or "学号" not in headers or
                 any(header not in STUDENT_IMPORT_HEADERS for header in headers) or
                 not any(header in STUDENT_IMPORT_COLUMNS and header != "学号" for header in headers)):
@@ -270,7 +270,7 @@ def confirm_student_accounts(batch_id, actor):
                         len(set(profile_fields)) != len(profile_fields)):
                     raise ValidationError("预览更新字段无效，请重新上传。")
             for row in batch.payload:
-                required = {"username", "full_name", "id_number", "enrollment_status", "student_class"}
+                required = set(User.REQUIRED_STUDENT_FIELDS)
                 if batch.mode == "update":
                     required &= {"username", *profile_fields}
                     if row.get("update_fields", list(STUDENT_PROFILE_COLUMNS)) != profile_fields or any(field not in row for field in profile_fields):

@@ -39,10 +39,11 @@ class LoginForm(AuthenticationForm):
 class StudentProfileMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for name in ["full_name", "username", "id_number", "student_class"]:
+        for name in User.REQUIRED_STUDENT_FIELDS:
             self.fields[name].required = True
         self.fields["id_number"].help_text = "填写18位居民身份证号，末位 X 不区分大小写。"
         self.fields["party_branch"].label = "所在党支部（选填）"
+        self.fields["student_class"].label = "所在班级（选填）"
         self.fields["party_branch"].help_text = "没有所属党支部时可留空，也可填写“无”。"
         self.fields["department"].label = "院系（选填）"
 

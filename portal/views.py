@@ -901,7 +901,7 @@ def account_upload(request):
     return form_page(request, form, "批量导入学生信息", reverse("account_list"),
         "新增模式创建账号；更新模式按学号定位，只修改 CSV 中保留的资料列。两种方式均先校验预览，再整批确认。",
         "校验并预览", template_download=reverse("account_template"),
-        template_hint="新增必填学号、姓名、身份证号、在校状态、所在班级和初始密码；党支部、政治面貌、院系选填。学号列使用文本格式保留前导零，保存为 UTF-8 CSV。",
+        template_hint="新增时请填写学号、姓名、身份证号、在校状态和初始密码。所在班级、党支部、政治面貌和院系选填。学号列使用文本格式保留前导零，保存为 UTF-8 CSV。",
         student_import=True)
 
 

@@ -15,6 +15,8 @@ def private_upload(instance, filename):
 
 
 class User(AbstractUser):
+    REQUIRED_STUDENT_FIELDS = ("username", "full_name", "id_number", "enrollment_status")
+
     class EnrollmentStatus(models.TextChoices):
         ENROLLED = "enrolled", "在校"
         GRADUATED = "graduated", "毕业"
@@ -92,7 +94,7 @@ class User(AbstractUser):
 
     @property
     def profile_complete(self):
-        return all([self.username, self.full_name, self.id_number, self.enrollment_status, self.student_class])
+        return all(getattr(self, field) for field in self.REQUIRED_STUDENT_FIELDS)
 
     @property
     def display_name(self):
@@ -141,6 +143,7 @@ class Notification(Timestamped):
         AWARDS = "awards", "评奖评优"
         COMPETITION = "competition", "竞赛"
         CULTURE_SPORTS = "culture_sports", "文体活动"
+        ACADEMIC_RESEARCH = "academic_research", "学术科研"
         DEPARTURE = "departure", "离校手续"
         OTHER = "other", "其他"
 

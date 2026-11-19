@@ -44,7 +44,9 @@ def filtered_students(form):
     if data["cadre"]:
         history = CadreTenure.objects.filter(student_id=OuterRef("pk"))
         qs = qs.filter(Exists(history) if data["cadre"] == "yes" else ~Exists(history))
-    missing = Q(full_name="") | Q(id_number="") | Q(enrollment_status="") | Q(student_class="")
+    missing = Q()
+    for field in User.REQUIRED_STUDENT_FIELDS:
+        missing |= Q(**{field: ""})
     if data["completeness"] == "incomplete":
         qs = qs.filter(missing)
     elif data["completeness"] == "complete":

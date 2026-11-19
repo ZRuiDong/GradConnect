@@ -1,5 +1,5 @@
 {% extends 'base.html' %}{% block title %}{{ title }}{% endblock %}{% block content %}
-<a class="back-link" href="{% url 'account_list' %}">← 学生信息汇总</a><div class="page-heading"><div><p class="eyebrow">STUDENT INFORMATION</p><h1>{{ title }}</h1><p>姓名、学号、身份证号、在校状态、所在班级必填；所在党支部、政治面貌、院系和干部履职记录选填。</p></div></div>
+<a class="back-link" href="{% url 'account_list' %}">← 学生信息汇总</a><div class="page-heading"><div><p class="eyebrow">STUDENT INFORMATION</p><h1>{{ title }}</h1><p>姓名、学号、身份证号和在校状态必填。所在班级、所在党支部、政治面貌、院系和干部履职记录选填。</p></div></div>
 <form method="post" class="panel student-form" data-student-form>{% csrf_token %}
   {% if not is_new %}<input type="hidden" name="edit_token" value="{{ edit_token }}">{% endif %}
   {% if edit_conflict %}<div class="notice error" role="alert">请先重新加载并核对其他管理员已保存的资料。<a href="{% url 'account_edit' item.pk %}">重新加载最新资料 ↗</a></div>{% endif %}

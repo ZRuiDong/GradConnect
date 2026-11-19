@@ -69,14 +69,14 @@ class StudentInformationTests(TestCase):
         self.assertNotContains(self.client.get(reverse("dashboard")), "学生信息汇总")
 
     def test_required_fields_for_create_and_edit(self):
-        for field in ["username", "full_name", "id_number", "enrollment_status", "student_class"]:
+        for field in ["username", "full_name", "id_number", "enrollment_status"]:
             data = self.data()
             data[field] = ""
             response = self.client.post(reverse("account_create"), data)
             self.assertIn(field, response.context["form"].errors)
         self.assertFalse(User.objects.filter(username="000003").exists())
-        response = self.client.post(reverse("account_edit", args=[self.student.pk]), self.edit_data(student_class=""))
-        self.assertIn("student_class", response.context["form"].errors)
+        response = self.client.post(reverse("account_edit", args=[self.student.pk]), self.edit_data(full_name=""))
+        self.assertIn("full_name", response.context["form"].errors)
 
     def test_creation_optional_politics_no_tenure_and_privilege_forgery_ignored(self):
         response = self.client.post(reverse("account_create"), self.data(is_staff="on", is_superuser="on", is_archived="on"))
@@ -260,7 +260,7 @@ class StudentInformationTests(TestCase):
 
     def test_profile_update_rejects_unknown_admin_password_and_missing_fields(self):
         for usernames, extra in [(["missing"], {}), ([self.admin.username], {}), (None, {"password": "Unexpected!Maple2026"}),
-                                 (None, {"class_name": ""}), (None, {"id_number": ""})]:
+                                 (None, {"name": ""}), (None, {"id_number": ""})]:
             with self.subTest(usernames=usernames, extra=extra), self.assertRaises(ValidationError):
                 parse_student_accounts(self.update_upload(usernames, **extra), mode="update")
         self.student.refresh_from_db()
@@ -304,14 +304,15 @@ class StudentInformationTests(TestCase):
         rows = parse_student_accounts(self.partial_upload(headers, values), mode="update")
         return StudentImportBatch.objects.create(uploaded_by=self.admin, mode="update", row_count=len(rows), payload=rows)
 
-    def test_party_branch_optional_for_create_edit_and_completeness_filter(self):
-        response = self.client.post(reverse("account_create"), self.data(party_branch=""))
+    def test_party_branch_and_class_optional_for_create_edit_and_completeness_filter(self):
+        response = self.client.post(reverse("account_create"), self.data(party_branch="", student_class=""))
         created = User.objects.get(username="000003")
         self.assertRedirects(response, reverse("account_detail", args=[created.pk]))
         self.assertTrue(created.profile_complete)
-        self.client.post(reverse("account_edit", args=[self.student.pk]), self.edit_data(party_branch=""))
+        self.client.post(reverse("account_edit", args=[self.student.pk]), self.edit_data(party_branch="", student_class=""))
         self.student.refresh_from_db()
         self.assertEqual(self.student.party_branch, "")
+        self.assertEqual(self.student.student_class, "")
         self.assertTrue(self.student.profile_complete)
         response = self.client.get(reverse("account_list"), {"party_branch": "__empty__", "completeness": "complete"})
         self.assertEqual({item.pk for item in response.context["page_obj"]}, {created.pk, self.student.pk})
@@ -326,6 +327,31 @@ class StudentInformationTests(TestCase):
         item = User.objects.get(username="legacy-template")
         self.assertEqual((item.party_branch, item.student_class, item.department), ("", "唯一班级", "独立学院"))
         self.assertTrue(item.profile_complete)
+
+    def test_create_import_with_blank_or_omitted_class(self):
+        for omit_class in (False, True):
+            with self.subTest(omit_class=omit_class):
+                headers = list(STUDENT_IMPORT_HEADERS)
+                username = f"optional-class-{int(omit_class)}"
+                values = [username, "导入学生", "110000199001010001", "在校", "", "", "", "学院", "Initial!Maple2026"]
+                if omit_class:
+                    values.pop(headers.index("所在班级"))
+                    headers.remove("所在班级")
+                upload = self.partial_upload(headers, [values])
+                response = self.client.post(reverse("account_upload"), {"mode": "create", "file": upload})
+                self.assertEqual(response.status_code, 302)
+                self.assertContains(self.client.get(response.url), "<small>未填写</small>", html=True)
+                self.assertRedirects(self.client.post(response.url, {"action": "confirm"}), reverse("account_list"))
+                item = User.objects.get(username=username)
+                self.assertEqual((item.student_class, item.department), ("", "学院"))
+                self.assertTrue(item.profile_complete)
+
+    def test_update_import_can_clear_existing_class(self):
+        batch = self.partial_batch(["学号", "所在班级"], [[self.student.username, ""]])
+        confirm_student_accounts(batch.pk, self.admin)
+        self.student.refresh_from_db()
+        self.assertEqual(self.student.student_class, "")
+        self.assertTrue(self.student.profile_complete)
 
     def test_politics_template_and_partial_http_update_preserve_other_data(self):
         self.assertEqual(list(csv.reader(io.StringIO(self.client.get(reverse("account_template")).content.decode("utf-8-sig"))))[0], STUDENT_IMPORT_HEADERS)
