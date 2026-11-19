@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source = readFileSync(new URL('../static/app.js', import.meta.url), 'utf8');
 const key = 'gradconnect.columns.v1.admin.students';
-function fixture(stored = null, unavailable = false) {
+function fixture(stored = null, unavailable = false, viewportWidth = 390) {
   const storage = new Map(stored === null ? [] : [[key, stored]]);
   const classes = new Set();
   const columns = [
@@ -29,18 +29,22 @@ function fixture(stored = null, unavailable = false) {
   }
   const handles = columns.slice(1).map(col => element({columnResizer: col.dataset.colKey}));
   const reset = element({resetColumns: 'students'});
-  const table = {dataset: {resizableColumns: 'students'}, style: {},
+  const table = {dataset: {resizableColumns: 'students'}, style: {}, parentElement: {clientWidth: viewportWidth},
     querySelectorAll: selector => selector.startsWith('col[') ? columns : handles};
   const document = {body: {dataset: {navRole: 'admin'}, classList: {add: name => classes.add(name), remove: name => classes.delete(name)}},
     querySelector: () => null, addEventListener() {},
     querySelectorAll: selector => selector === '[data-resizable-columns]' ? [table] : selector === '[data-reset-columns]' ? [reset] : []};
-  const window = {addEventListener() {}, localStorage: {
+  const events = new Map();
+  const window = {addEventListener(name, callback) { events.set(name, callback); }, localStorage: {
     getItem(name) { if (unavailable) throw Error('Storage disabled'); return storage.get(name) ?? null; },
     setItem(name, value) { if (unavailable) throw Error('Storage disabled'); storage.set(name, value); },
     removeItem(name) { if (unavailable) throw Error('Storage disabled'); storage.delete(name); },
   }};
   vm.runInNewContext(source, {document, window});
-  return {columns, handles, reset, table, storage, classes};
+  return {columns, handles, reset, table, storage, classes, resize(width) {
+    table.parentElement.clientWidth = width;
+    events.get('resize')();
+  }};
 }
 
 let f = fixture();
@@ -91,4 +95,19 @@ f.handles[0].fire('keydown', {key: 'ArrowRight'});
 assert.equal(f.columns[1].style.width, '200px');
 f.reset.fire('click');
 assert.equal(f.columns[1].style.width, '190px');
+
+f = fixture(JSON.stringify({select: 46, identity: 190, actions: 300}), false, 800);
+assert.equal(f.table.style.width, '800px');
+f.handles[0].fire('keydown', {key: 'Home'});
+f.resize(390);
+assert.equal(f.table.style.width, '466px'); // The saved identity column stays at 120px.
+f.resize(800);
+assert.equal(f.columns[1].style.width, '120px');
+f.handles[0].fire('dblclick');
+assert.equal(f.table.style.width, '800px');
+f.resize(390);
+assert.equal(f.table.style.width, '536px');
+f.resize(3400);
+assert.equal(f.table.style.width, '3400px');
+assert.equal(f.columns[0].style.width, '46px');
 console.log('PASS: pointer drag, multi-pointer isolation, width bounds, keyboard, cancel, accessibility values, persistence, reset and unavailable/corrupt storage.');

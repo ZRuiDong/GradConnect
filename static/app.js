@@ -354,15 +354,25 @@ document.querySelectorAll('[data-resizable-columns]').forEach(table => {
   const cols = Array.from(table.querySelectorAll('col[data-col-key]'));
   const handles = Array.from(table.querySelectorAll('[data-column-resizer]'));
   const storageKey = `gradconnect.columns.v1.${document.body.dataset.navRole}.${table.dataset.resizableColumns}`;
-  const clamp = (col, value) => Math.round(Math.max(Number(col.dataset.min), Math.min(Number(col.dataset.max), value)));
+  const limits = cols.map(col => Number(col.dataset.max));
+  const clamp = (index, value) => Math.round(Math.max(Number(cols[index].dataset.min), Math.min(limits[index], value)));
   let saved = {};
   try {
     const value = JSON.parse(window.localStorage.getItem(storageKey) || '{}');
     if (value && typeof value === 'object' && !Array.isArray(value)) saved = value;
   } catch (_) { /* Default widths also work without browser storage. */ }
-  const widths = cols.map(col => {
+  const defaults = cols.map(col => Number(col.dataset.width));
+  const widths = defaults.slice();
+  const growth = cols.map((col, index) => Number(col.dataset.max) - defaults[index]);
+  const baseWidth = defaults.reduce((sum, width) => sum + width, 0);
+  const capacity = growth.reduce((sum, extra) => sum + extra, 0);
+  // Earlier versions stored all columns, including untouched defaults.
+  const legacyWidths = cols.every(col => Object.hasOwn(saved, col.dataset.colKey));
+  cols.forEach((col, index) => {
     const value = saved[col.dataset.colKey];
-    return clamp(col, typeof value === 'number' && Number.isFinite(value) ? value : Number(col.dataset.width));
+    if (!Number.isFinite(value) || !growth[index] || (legacyWidths && value === defaults[index])) {
+      delete saved[col.dataset.colKey];
+    }
   });
   const apply = () => {
     cols.forEach((col, index) => { col.style.width = `${widths[index]}px`; });
@@ -370,10 +380,25 @@ document.querySelectorAll('[data-resizable-columns]').forEach(table => {
     handles.forEach(handle => {
       const index = cols.findIndex(col => col.dataset.colKey === handle.dataset.columnResizer);
       handle.setAttribute('aria-valuenow', String(widths[index]));
+      handle.setAttribute('aria-valuemax', String(limits[index]));
     });
   };
+  const fit = () => {
+    const surplus = Math.max(0, table.parentElement.clientWidth - baseWidth);
+    let allocated = 0;
+    let cumulative = 0;
+    cols.forEach((col, index) => {
+      cumulative += growth[index];
+      const share = capacity ? Math.round(surplus * cumulative / capacity) : 0;
+      const automaticWidth = defaults[index] + share - allocated;
+      limits[index] = Math.max(Number(col.dataset.max), automaticWidth);
+      widths[index] = clamp(index, saved[col.dataset.colKey] ?? automaticWidth);
+      allocated = share;
+    });
+    apply();
+  };
   const persist = () => {
-    try { window.localStorage.setItem(storageKey, JSON.stringify(Object.fromEntries(cols.map((col, i) => [col.dataset.colKey, widths[i]])))); } catch (_) { /* Resizing remains usable. */ }
+    try { window.localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (_) { /* Resizing remains usable. */ }
   };
   let drag = null;
   handles.forEach(handle => {
@@ -389,7 +414,8 @@ document.querySelectorAll('[data-resizable-columns]').forEach(table => {
     });
     handle.addEventListener('pointermove', event => {
       if (!drag || drag.handle !== handle || drag.pointer !== event.pointerId) return;
-      widths[index] = clamp(cols[index], drag.width + event.clientX - drag.start);
+      widths[index] = clamp(index, drag.width + event.clientX - drag.start);
+      saved[cols[index].dataset.colKey] = widths[index];
       apply();
     });
     const finish = event => {
@@ -403,26 +429,28 @@ document.querySelectorAll('[data-resizable-columns]').forEach(table => {
     handle.addEventListener('keydown', event => {
       const step = event.shiftKey ? 50 : 10;
       const targets = {ArrowLeft: widths[index] - step, ArrowRight: widths[index] + step,
-        Home: Number(cols[index].dataset.min), End: Number(cols[index].dataset.max)};
+        Home: Number(cols[index].dataset.min), End: limits[index]};
       if (!Object.hasOwn(targets, event.key)) return;
       event.preventDefault();
-      widths[index] = clamp(cols[index], targets[event.key]);
+      widths[index] = clamp(index, targets[event.key]);
+      saved[cols[index].dataset.colKey] = widths[index];
       apply(); persist();
     });
     handle.addEventListener('dblclick', () => {
-      widths[index] = Number(cols[index].dataset.width);
-      apply(); persist();
+      delete saved[cols[index].dataset.colKey];
+      fit(); persist();
     });
   });
   document.querySelectorAll('[data-reset-columns]').forEach(button => {
     if (button.dataset.resetColumns !== table.dataset.resizableColumns) return;
     button.addEventListener('click', () => {
-      cols.forEach((col, index) => { widths[index] = Number(col.dataset.width); });
-      apply();
+      saved = {};
+      fit();
       try { window.localStorage.removeItem(storageKey); } catch (_) { /* Ignore unavailable storage. */ }
     });
   });
-  apply();
+  fit();
+  window.addEventListener('resize', fit);
 });
 
 // An open background tab is not activity: send only after a real visible interaction.
