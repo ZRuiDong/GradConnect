@@ -1,5 +1,6 @@
 import csv
 import hashlib
+import json
 from datetime import date, timedelta
 from functools import wraps
 from pathlib import Path
@@ -34,7 +35,7 @@ from .models import (AttendanceBatch, Audit, Conversation, FAQ, InquiryCategory,
                      LoginGuard, Message, Notification, Policy, PolicyRevision,
                      Publication, ServiceGuide, GuideAttachment, StudentImportBatch, User, Video)
 from .services import (audit, confirm_attendance, confirm_student_accounts, parse_attendance,
-                       parse_student_accounts, transition_leave)
+                       prepare_student_account_import, transition_leave)
 from .leave_reports import filtered_leaves, leave_csv_rows
 from .uploads import GUIDE_FILE_TYPES, NOTIFICATION_FILE_TYPES, rollback_uploads
 
@@ -887,17 +888,40 @@ def attendance_template(request):
     return response
 
 
+def _save_student_preview(actor, rows, mode):
+    batch = StudentImportBatch.objects.create(uploaded_by=actor, row_count=len(rows), payload=rows, mode=mode)
+    return reverse("account_preview", args=[batch.pk])
+
+
+def _student_preview_events(actor, total, chunks):
+    rows = []
+    yield json.dumps({"completed": 0, "total": total}) + "\n"
+    for chunk in chunks:
+        rows.extend(chunk)
+        yield json.dumps({"completed": len(rows), "total": total}) + "\n"
+    yield json.dumps({"preview": _save_student_preview(actor, rows, "create")}) + "\n"
+
+
 @staff_only
 def account_upload(request):
+    stream = request.method == "POST" and request.headers.get("Accept") == "application/x-ndjson"
     form = StudentImportForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
+        mode = form.cleaned_data["mode"]
         try:
-            rows = parse_student_accounts(form.cleaned_data["file"], mode=form.cleaned_data["mode"])
+            total, chunks = prepare_student_account_import(form.cleaned_data["file"], mode)
         except ValidationError as exc:
             form.add_error("file", exc)
         else:
-            batch = StudentImportBatch.objects.create(uploaded_by=request.user, row_count=len(rows), payload=rows, mode=form.cleaned_data["mode"])
-            return redirect("account_preview", pk=batch.pk)
+            if stream and mode == "create":
+                response = StreamingHttpResponse(_student_preview_events(request.user, total, chunks),
+                                                 content_type="application/x-ndjson")
+                response["X-Accel-Buffering"] = "no"
+                return response
+            rows = [row for chunk in chunks for row in chunk]
+            return redirect(_save_student_preview(request.user, rows, mode))
+    if stream:
+        return JsonResponse({"errors": [error for errors in form.errors.values() for error in errors]}, status=400)
     return form_page(request, form, "批量导入学生信息", reverse("account_list"),
         "新增模式创建账号；更新模式按学号定位，只修改 CSV 中保留的资料列。两种方式均先校验预览，再整批确认。",
         "校验并预览", template_download=reverse("account_template"),

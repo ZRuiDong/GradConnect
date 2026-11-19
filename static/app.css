@@ -490,3 +490,9 @@ a.page-link:hover{background:#f0f5ef;border-color:#bbcebd;color:var(--green)}
   .sort-controls { gap: 3px; }
   .sort-direction { min-width: 32px; min-height: 24px; }
 }
+
+.import-progress { margin-top: 1rem; }
+.import-progress progress { display: block; width: min(100%, 30rem); accent-color: var(--green); }
+.import-progress p { margin: .4rem 0 0; font-variant-numeric: tabular-nums; }
+.import-errors { margin-top: 1rem; white-space: pre-line; }
+.import-progress[hidden], .import-errors[hidden] { display: none; }

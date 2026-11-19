@@ -34,11 +34,75 @@ document.querySelectorAll('form[data-upload-form]').forEach(form => {
           return;
         }
         form.dataset.submitting = '1';
-        form.setAttribute('aria-busy', 'true');
+        form.querySelector('[data-import-errors]').hidden = true;
+        if (form.elements.mode.value === 'create' && window.fetch && window.TextDecoderStream && window.ReadableStream) {
+          event.preventDefault();
+          showStudentImportProgress(form);
+        } else {
+          form.setAttribute('aria-busy', 'true');
+        }
       }
     }
   });
 });
+
+async function showStudentImportProgress(form) {
+  const panel = form.querySelector('[data-import-progress]');
+  const bar = panel.querySelector('progress');
+  const label = panel.querySelector('[data-import-count]');
+  const errors = form.querySelector('[data-import-errors]');
+  const hint = form.querySelector('.upload-hint');
+  hint.hidden = true;
+  panel.hidden = false;
+  bar.removeAttribute('value');
+  label.textContent = '正在上传并校验学生资料…';
+  const submit = form.querySelector('button[type=submit]');
+  submit.disabled = true;
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST', body: new FormData(form), headers: {Accept: 'application/x-ndjson'}
+    });
+    if (response.redirected) {
+      window.location.assign(response.url);
+      return;
+    }
+    const type = response.headers.get('Content-Type') || '';
+    if (response.status === 400 && type.startsWith('application/json')) {
+      throw new Error((await response.json()).errors.join('\n'));
+    }
+    if (!response.ok || !response.body || !type.startsWith('application/x-ndjson')) {
+      throw new Error(`未收到导入进度（HTTP ${response.status}），请刷新页面后重试。`);
+    }
+    const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = '';
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      const lines = (buffer + value).split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        const step = JSON.parse(line);
+        if (step.preview) {
+          window.location.assign(step.preview);
+          return;
+        }
+        bar.max = step.total;
+        bar.value = step.completed;
+        label.textContent = `已处理 ${step.completed} / ${step.total} 个初始密码` +
+          (step.completed === step.total ? '，正在生成预览…' : '');
+      }
+    }
+    throw new Error('连接已中断，请重新上传以获取预览。');
+  } catch (error) {
+    panel.hidden = true;
+    errors.textContent = error instanceof TypeError ? '无法连接服务器，请检查网络后重新上传。' : error.message;
+    errors.hidden = false;
+    submit.disabled = false;
+    delete form.dataset.submitting;
+    form.removeAttribute('aria-busy');
+  }
+}
+
 window.addEventListener('pageshow', event => {
   if (!event.persisted) return;
   document.querySelectorAll('form[data-student-import]').forEach(form => {
@@ -46,6 +110,8 @@ window.addEventListener('pageshow', event => {
     form.removeAttribute('aria-busy');
     const hint = form.querySelector('.upload-hint');
     if (hint) hint.hidden = true;
+    form.querySelector('[data-import-progress]').hidden = true;
+    form.querySelector('button[type=submit]').disabled = false;
   });
 });
 document.querySelectorAll('[data-tenure-manager]').forEach(manager => {

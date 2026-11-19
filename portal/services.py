@@ -2,6 +2,7 @@ import calendar
 import csv
 import re
 import io
+import os
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from datetime import timedelta
@@ -146,8 +147,8 @@ def existing_account_names():
     return {User.normalize_username(name).casefold() for name in User.objects.values_list("username", flat=True)}
 
 
-def parse_student_accounts(upload, mode="create"):
-    """校验整份学生资料，新增模式才计算密码哈希；不写入账号。"""
+def prepare_student_account_import(upload, mode="create"):
+    """先校验整份文件，再按原始顺序提供可安全保存的预览数据块。"""
     if upload.size > STUDENT_IMPORT_MAX_BYTES:
         raise ValidationError("请上传不超过 5 MB 的 CSV 文件。")
     try:
@@ -229,14 +230,30 @@ def parse_student_accounts(upload, mode="create"):
     if mode == "update":
         for row in rows:
             row.pop("password", None)
-        return rows
-    # 密码只在当前请求的内存中短暂使用，预览记录不保留明文。
+        return len(rows), (rows,)
+    return len(rows), _hash_student_chunks(rows)
+
+
+# 工作线程按需启动，同一进程内同时导入的批次共用并行额度。
+_available_cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count() or 1
+_hash_workers = min(_available_cpus, max(2, _available_cpus - 1), 4)
+_student_hash_pool = ThreadPoolExecutor(max_workers=_hash_workers, thread_name_prefix="student-import")
+
+
+def _hash_student_chunks(rows):
     def encode_row(row):
         row["password_hash"] = make_password(row.pop("password"))
         return row
-    # 仅并行计算密码，不在线程中访问数据库；每人依然使用独立盐值和正常的密码算法。
-    with ThreadPoolExecutor(max_workers=2) as pool:
-        return list(pool.map(encode_row, rows))
+
+    # 每次只调度一小块，断开流后不会继续计算整份名单。
+    chunk_size = _hash_workers * 4
+    for start in range(0, len(rows), chunk_size):
+        yield list(_student_hash_pool.map(encode_row, rows[start:start + chunk_size]))
+
+
+def parse_student_accounts(upload, mode="create"):
+    _, chunks = prepare_student_account_import(upload, mode)
+    return [row for chunk in chunks for row in chunk]
 
 
 def confirm_student_accounts(batch_id, actor):

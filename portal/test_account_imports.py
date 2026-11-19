@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 from datetime import timedelta
 from unittest.mock import patch
 from django.contrib.auth.hashers import make_password
@@ -81,6 +82,48 @@ class StudentAccountImportTests(TestCase):
         self.assertTrue(response.content.startswith(b"\xef\xbb\xbf"))
         self.assertEqual(list(csv.reader(io.StringIO(response.content.decode("utf-8-sig")))), [STUDENT_IMPORT_HEADERS])
         self.assertIn("attachment", response["Content-Disposition"])
+
+    def test_stream_reports_only_completed_counts_until_preview_is_saved(self):
+        self.client.force_login(self.admin)
+        students = [[f"stream-{i}", "学生", "", "Initial!Maple2026"] for i in range(40)]
+        response = self.client.post(reverse("account_upload"), {"mode": "create", "file": self.upload_file(students)},
+                                    HTTP_ACCEPT="application/x-ndjson")
+        self.assertEqual(response["X-Accel-Buffering"], "no")
+        self.assertEqual(response["Cache-Control"], "private, no-store")
+        events = iter(response.streaming_content)
+        self.assertEqual(json.loads(next(events)), {"completed": 0, "total": len(students)})
+        completed = 0
+        while completed < len(students):
+            event = json.loads(next(events))
+            self.assertGreater(event["completed"], completed)
+            self.assertLess(event["completed"] - completed, len(students))
+            completed = event["completed"]
+            self.assertEqual(event, {"completed": completed, "total": len(students)})
+        self.assertFalse(StudentImportBatch.objects.exists())
+        final = json.loads(next(events))
+        self.assertEqual(list(events), [])
+        batch = StudentImportBatch.objects.get(uploaded_by=self.admin)
+        self.assertEqual(final, {"preview": reverse("account_preview", args=[batch.pk])})
+        self.assertFalse(User.objects.filter(username__startswith="stream-").exists())
+        self.assertEqual([row["username"] for row in batch.payload], [item[0] for item in students])
+        self.assertTrue(all("password_hash" in row and "password" not in row for row in batch.payload))
+        self.client.post(final["preview"], {"action": "confirm"})
+        self.assertEqual(User.objects.filter(username__startswith="stream-").count(), len(students))
+
+    def test_invalid_stream_and_disconnect_do_not_save_partial_previews(self):
+        self.client.force_login(self.admin)
+        url = reverse("account_upload")
+        response = self.client.post(url, {"file": self.upload_file([["invalid", "学生", "", "123"]])},
+                                    HTTP_ACCEPT="application/x-ndjson")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("第 2 行", " ".join(response.json()["errors"]))
+        response = self.client.post(url, {"file": self.upload_file()}, HTTP_ACCEPT="application/x-ndjson")
+        events = iter(response.streaming_content)
+        next(events)
+        next(events)
+        response.close()
+        self.assertFalse(StudentImportBatch.objects.exists())
+        self.assertFalse(User.objects.filter(username="00000003").exists())
 
     def test_permissions_and_preview_ownership(self):
         batch = self.create_preview()
