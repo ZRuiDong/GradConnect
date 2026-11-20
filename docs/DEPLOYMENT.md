@@ -67,7 +67,7 @@ set +a
 
 生产中 `USE_X_ACCEL_REDIRECT=1`，Django 先校验登录、数据归属和发布状态，再由 Nginx 内部传送文件，支持视频 Range 请求。`/_protected/` 的 `internal` 必须保留，不能将 `media/` 配成公共静态目录。Nginx 必须覆盖 `X-Forwarded-Proto`，应用仅接受本机代理。
 
-Nginx 的请求体上限按入口设置，并不替代应用的文件校验：普通入口 32 MB，学生账号导入 6 MB，视频上传 512 MB，指南新增/编辑及实习/租房申请（含重新提交入口）256 MB。应用对应限制仍是账号 CSV 5 MB、单视频 500 MB、指南与申请至多 10 个附件且每个 20 MB。变更入口或上传限制时须同步核对代理配置。Nginx 请求体临时目录和系统临时目录应有足够空间，部署压测须包含多附件及大视频上传。
+Nginx 的普通入口请求体上限为 32 MB，学生账号导入为 6 MB，视频上传为 512 MB。指南新增与编辑、日常请假、实习及租房申请（含重新提交）均为 256 MB。应用另行校验账号 CSV 最多 5 MB、单视频最多 500 MB、指南与申请至多 10 个附件且每个最多 20 MB。升级日常请假佐证材料功能时，执行 `python manage.py migrate` 应用 `0018_leave_attachment`，并将 `deploy/nginx.conf` 中涵盖 `/leaves/new/` 的上传规则合并至当前站点，运行 `nginx -t` 后重载 Nginx。Nginx 请求体临时目录和系统临时目录应有足够空间。
 
 账号批量导入支持单次 2000 人 / 5 MB。同步 `deploy/nginx.conf` 中 `location = /accounts/upload/` 的专用配置（`proxy_read_timeout 600s`），执行 `sudo nginx -t` 后重载。Gunicorn 保持 `gthread`，其 `timeout` 是工作进程心跳超时，不是长请求的响应等待期限。同步 `graceful_timeout=600`，并同步 systemd 的 `KillSignal=SIGTERM`、`TimeoutStopSec=620`，执行 `systemctl daemon-reload` 后在维护窗口重启应用。这样工作进程自动回收及平滑重启可以等待批量请求完成。若服务器前还有其他代理或网关，也要核对该上传入口的等待时间。建议仍在导入结束后部署更新。
 

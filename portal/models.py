@@ -14,6 +14,11 @@ def private_upload(instance, filename):
     return f"{instance._meta.model_name}/{uuid4().hex}{Path(filename).suffix.lower()}"
 
 
+def leave_attachment_upload(instance, filename):
+    # 文件类型不限，私有存储路径不使用用户提供的文件名或扩展名。
+    return f"leaveattachment/{uuid4().hex}"
+
+
 class User(AbstractUser):
     REQUIRED_STUDENT_FIELDS = ("username", "full_name", "id_number", "enrollment_status")
 
@@ -232,6 +237,15 @@ class Leave(Timestamped):
     class Meta:
         ordering = ["-created_at"]
         constraints = [models.CheckConstraint(condition=Q(ends_at__gt=models.F("starts_at")), name="leave_end_after_start")]
+
+
+class LeaveAttachment(models.Model):
+    leave = models.ForeignKey(Leave, on_delete=models.CASCADE, related_name="attachments")
+    file = models.FileField(upload_to=leave_attachment_upload)
+    original_name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ["pk"]
 
 
 class LeaveEvent(models.Model):

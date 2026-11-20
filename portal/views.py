@@ -31,7 +31,7 @@ from .forms import (ATTENDANCE_SORT_CHOICES, AttendanceMonthForm, AttendanceFilt
                     PolicyFilterForm, PolicyForm, StudentImportForm,
                     STUDENT_IMPORT_HEADERS, STUDENT_IMPORT_COLUMNS, STUDENT_POLITICS_UPDATE_HEADERS,
                     ServiceGuideForm, ServiceGuideFilterForm, VideoFilterForm, VideoForm, VideoMetadataForm)
-from .models import (AttendanceBatch, Audit, Conversation, FAQ, InquiryCategory, Leave, LeaveEvent, MonthlyAttendance,
+from .models import (AttendanceBatch, Audit, Conversation, FAQ, InquiryCategory, Leave, LeaveAttachment, LeaveEvent, MonthlyAttendance,
                      LoginGuard, Message, Notification, Policy, PolicyRevision,
                      Publication, ServiceGuide, GuideAttachment, StudentImportBatch, User, Video)
 from .services import (audit, confirm_attendance, confirm_student_accounts, parse_attendance,
@@ -408,9 +408,9 @@ def leave_create(request):
     if source := query_id(request, "from"):
         previous = get_object_or_404(Leave, pk=source, student=request.user, status=Leave.Status.REJECTED)
         initial = model_to_dict(previous, fields=LeaveForm.Meta.fields)
-    form = LeaveForm(request.POST or None, initial=initial, user=request.user)
+    form = LeaveForm(request.POST if request.method == "POST" else None, request.FILES, initial=initial, user=request.user)
     if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
+        with rollback_uploads() as uploads, transaction.atomic():
             item = form.save(commit=False)
             item.student = request.user
             item.student_name = form.cleaned_data["account_name"]
@@ -418,6 +418,8 @@ def leave_create(request):
             item.destination = f"{item.province} {item.city}"
             item.previous = previous
             item.save()
+            for upload in form.cleaned_data["attachments"]:
+                uploads.save(LeaveAttachment(leave=item, file=upload, original_name=upload.name))
             LeaveEvent.objects.create(leave=item, actor=request.user, status=Leave.Status.PENDING, note="提交请假申请")
             from .inbox import deliver
             deliver('leave', item, request.user, f'leave:{item.pk}:pending',
@@ -442,6 +444,14 @@ def leave_detail(request, pk):
     from .inbox import topic_context
     return render(request, "portal/leave_detail.html", {"item": item, "events": item.events.select_related("actor"),
         **topic_context(request.user, 'leave', item.pk)})
+
+
+@login_required
+@require_safe
+def leave_file(request, leave_pk, pk):
+    item = owned_leave(request, leave_pk)
+    attachment = get_object_or_404(item.attachments, pk=pk)
+    return send_private_file(request, attachment.file, "application/octet-stream", attachment.original_name, download=True)
 
 
 @login_required

@@ -219,7 +219,56 @@ class ApplicationTests(TestCase):
 
     def leave_data(self, **extra):
         return {"kind": "personal", "reason": "办理事务", "starts_at": "2026-11-10T08:00", "ends_at": "2026-11-11T18:00",
-                "province": "浙江省", "city": "杭州市", "contact": "13800000000", "tutor_signature": "no", **extra}
+                "province": "浙江省", "city": "杭州市", "contact": "13800000000", "tutor_signature": "no",
+                "attachments": self.upload(), **extra}
+
+    def test_leave_accepts_arbitrary_formats_and_downloads_only_with_permission(self):
+        files = [self.upload("情况说明.html", b"<p>evidence</p>"), self.upload("report", b"plain file")]
+        url = reverse("leave_create")
+        field = self.client.get(url).context["form"]["attachments"]
+        self.assertNotIn("accept=", str(field))
+        self.assertIn("required", str(field))
+        self.assertEqual(self.client.post(url, self.leave_data(attachments=files)).status_code, 302)
+        item = Leave.objects.get()
+        attachment, other_file = item.attachments.all()
+        self.assertEqual(other_file.original_name, "report")
+        download = reverse("leave_file", args=[item.pk, attachment.pk])
+        for user in [self.student, self.admin]:
+            self.client.force_login(user)
+            self.assertContains(self.client.get(reverse("leave_detail", args=[item.pk])), download)
+            response = self.client.get(download)
+            self.assertEqual(response["Content-Type"], "application/octet-stream")
+            self.assertEqual(response["X-Content-Type-Options"], "nosniff")
+            self.assertTrue(response["Content-Disposition"].startswith("attachment;"))
+            self.assertEqual(b"".join(response.streaming_content), b"<p>evidence</p>")
+        with self.settings(USE_X_ACCEL_REDIRECT=True):
+            self.assertRegex(self.client.get(download)["X-Accel-Redirect"], r"^/_protected/leaveattachment/[0-9a-f]{32}$")
+        self.client.force_login(self.other)
+        self.assertEqual(self.client.get(download).status_code, 404)
+        self.assertEqual(self.client.post(url, self.leave_data()).status_code, 302)
+        other_leave = Leave.objects.get(student=self.other)
+        self.assertEqual(self.client.get(reverse("leave_file", args=[other_leave.pk, attachment.pk])).status_code, 404)
+        self.client.logout()
+        self.assertRedirects(self.client.get(download), reverse("login") + "?next=" + download)
+
+    def test_invalid_leave_attachments_block_the_entire_submission(self):
+        invalid_batches = [
+            [self.upload(), self.upload("empty.txt", b"")],
+            [self.upload() for _ in range(11)],
+            [self.upload("large.bin", b"x" * (20 * 1024 * 1024 + 1))],
+        ]
+        for files in invalid_batches:
+            response = self.client.post(reverse("leave_create"), self.leave_data(attachments=files))
+            self.assertIn("attachments", response.context["form"].errors)
+        self.assertFalse(Leave.objects.exists())
+
+    def test_failed_leave_submission_cleans_up_uploaded_files(self):
+        from django.core.files.storage import default_storage
+        with patch("portal.views.audit", side_effect=RuntimeError("audit failed")):
+            with self.assertRaises(RuntimeError):
+                self.client.post(reverse("leave_create"), self.leave_data(attachments=[self.upload(), self.upload()]))
+        self.assertFalse(Leave.objects.exists())
+        self.assertEqual(default_storage.listdir("leaveattachment")[1], [])
 
     def test_leave_required_fields_including_province_city_tutor_signature(self):
         for field in self.leave_data():

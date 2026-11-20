@@ -102,12 +102,16 @@ def validate_notification_upload(upload):
         upload.seek(0)
 
 
+def validate_application_file_size(upload):
+    if upload.size > GUIDE_MAX_FILE_BYTES:
+        raise ValidationError("每个附件不能超过 20 MB。")
+
+
 def validate_registration_upload(upload):
     extension = Path(upload.name).suffix.lower()
     if extension not in REGISTRATION_FILE_TYPES:
         raise ValidationError("申请附件支持 JPG/PNG 图片、Word、Excel 或 PDF 文件。")
-    if upload.size > GUIDE_MAX_FILE_BYTES:
-        raise ValidationError("每个附件不能超过 20 MB。")
+    validate_application_file_size(upload)
     if extension in GUIDE_FILE_TYPES:
         return validate_guide_upload(upload)
     try:

@@ -234,10 +234,13 @@ def main():
                 student.get("/leaves/new/")
                 fields = {"kind": "personal", "starts_at": "2026-11-10T08:00", "ends_at": "2026-11-11T17:00",
                           "reason": "HTTP范围内请假", "province": "浙江省", "city": "杭州市", "tutor_signature": "no", "contact": "013800000000"}
-                assert student.post("/leaves/new/", fields)[0] == 200
+                assert "请至少上传一份请假佐证材料" in student.post("/leaves/new/", fields)[2].decode()
+                evidence = [("attachments", "evidence.bin", b"HTTP leave evidence", "application/octet-stream")]
+                assert student.multipart("/leaves/new/", fields, evidence)[0] == 200
                 item = Leave.objects.get(reason="HTTP范围内请假")
+                assert admin.get(f"/leaves/{item.pk}/files/{item.attachments.get().pk}/")[2] == b"HTTP leave evidence"
                 outside = {**fields, "starts_at": "2026-10-01T08:00", "ends_at": "2026-10-02T08:00", "reason": "HTTP范围外请假"}
-                assert student.post("/leaves/new/", outside)[0] == 200
+                assert student.multipart("/leaves/new/", outside, evidence)[0] == 200
                 passed("真实 HTTP 提交日期范围内外两笔请假")
                 query = urllib.parse.urlencode({"start_date": "2026-11-10", "end_date": "2026-11-12", "q": "00880001"})
                 status, _, page = admin.get("/leaves/?" + query)

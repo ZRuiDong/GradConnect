@@ -6,7 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 from .models import User, CadreTenure, PolicyRevision, Leave, FAQ, Video, Notification, ServiceGuide, GuideAttachment, InquiryCategory, Registration
-from .uploads import (GUIDE_MAX_ATTACHMENTS, validate_guide_upload, REGISTRATION_FILE_TYPES,
+from .uploads import (GUIDE_MAX_ATTACHMENTS, validate_guide_upload, REGISTRATION_FILE_TYPES, validate_application_file_size,
                       validate_registration_upload, NOTIFICATION_FILE_TYPES, validate_notification_upload)
 from .widgets import DropdownCheckboxSelect
 
@@ -292,11 +292,32 @@ class StudentIdentityForm(forms.ModelForm):
         self.order_fields(["account_name", "account_number", *self.fields])
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class ApplicationFilesField(forms.FileField):
+    widget = MultipleFileInput
+    default_error_messages = {"required": "请至少上传一份申请附件。"}
+
+    def clean(self, data, initial=None):
+        values = data if isinstance(data, (tuple, list)) else ([data] if data else [])
+        if not values and self.required:
+            raise ValidationError(self.error_messages["required"], code="required")
+        if len(values) > 10:
+            raise ValidationError("每份申请最多上传 10 个附件。")
+        clean_file = super().clean
+        return [clean_file(value, initial) for value in values]
+
+
 class LeaveForm(StudentIdentityForm):
     province = forms.CharField(label="去往省份 / 直辖市", min_length=2, max_length=40, help_text="例如：浙江省、上海市。")
     city = forms.CharField(label="去往城市", min_length=2, max_length=40, help_text="例如：杭州市；直辖市请填写对应城市名。")
     tutor_signature = forms.ChoiceField(label="是否导师本人线下签字", choices=Leave._meta.get_field("tutor_signature").choices,
         widget=forms.RadioSelect)
+    attachments = ApplicationFilesField(label="请假佐证材料", validators=[validate_application_file_size],
+        error_messages={"required": "请至少上传一份请假佐证材料。"},
+        help_text="每次提交请上传 1 至 10 份佐证材料，文件格式不限，每份最多 20 MB。")
 
     class Meta:
         model = Leave
@@ -405,10 +426,6 @@ class VideoFilterForm(forms.Form):
     category = forms.ChoiceField(label="视频类别", required=False, choices=[("", "全部类别"), *Video.Category.choices])
 
 
-class MultipleFileInput(forms.ClearableFileInput):
-    allow_multiple_selected = True
-
-
 class MultipleFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("widget", MultipleFileInput(attrs={"accept": ".xls,.xlsx,.doc,.docx,.pdf"}))
@@ -423,20 +440,8 @@ class MultipleFileField(forms.FileField):
         return [super(MultipleFileField, self).clean(value, initial) for value in values]
 
 
-class RegistrationFilesField(forms.FileField):
-    def clean(self, data, initial=None):
-        values = data if isinstance(data, (tuple, list)) else ([data] if data else [])
-        if not values:
-            if self.required:
-                raise ValidationError("请至少上传一份申请附件。")
-            return []
-        if len(values) > 10:
-            raise ValidationError("每份申请最多上传 10 个附件。")
-        return [super(RegistrationFilesField, self).clean(value, initial) for value in values]
-
-
 class RegistrationForm(StudentIdentityForm):
-    attachments = RegistrationFilesField(label="申请附件", validators=[validate_registration_upload],
+    attachments = ApplicationFilesField(label="申请附件", validators=[validate_registration_upload],
         widget=MultipleFileInput(attrs={"accept": ",".join(REGISTRATION_FILE_TYPES)}),
         help_text='可去<a href="/guides/">办事指南（业务流程）模块</a>寻找申请模板。至少上传 1 份，最多 10 份；支持 JPG/PNG、Word、Excel、PDF，每份最多 20 MB。')
     has_dorm = forms.TypedChoiceField(label="是否有校内宿舍", choices=[("", "请选择"), ("yes", "是"), ("no", "否")],

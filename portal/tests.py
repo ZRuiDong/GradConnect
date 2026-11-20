@@ -170,13 +170,29 @@ class PortalTests(TestCase):
         data = {"kind": "personal", "starts_at": "2026-11-20T10:00", "ends_at": "2026-11-20T09:00", "reason": "事由", "province": "浙江省", "city": "杭州市", "tutor_signature": "yes", "contact": "13800000000"}
         self.assertContains(self.client.post(reverse("leave_create"), data), "结束时间必须晚于开始时间")
         data["ends_at"] = "2026-11-21T10:00"
+        data["attachments"] = SimpleUploadedFile("original.txt", b"original")
         self.client.post(reverse("leave_create"), data)
         original = Leave.objects.get()
         transition_leave(original.pk, self.admin, "reject", "请完善原因")
-        self.client.post(reverse("leave_create") + f"?from={original.pk}", data)
+        resubmit_url = reverse("leave_create") + f"?from={original.pk}"
+        del data["attachments"]
+        self.assertContains(self.client.post(resubmit_url, data), "请至少上传一份请假佐证材料")
+        self.assertEqual(Leave.objects.count(), 1)
+        data["attachments"] = SimpleUploadedFile("revised.txt", b"revised")
+        self.client.post(resubmit_url, data)
         self.assertEqual(Leave.objects.count(), 2)
         self.assertEqual(Leave.objects.first().previous_id, original.pk)
+        self.assertEqual(original.attachments.get().original_name, "original.txt")
+        self.assertEqual(Leave.objects.first().attachments.get().original_name, "revised.txt")
         self.assertEqual(original.events.count(), 2)
+
+    def test_legacy_leave_without_attachments_can_still_be_reviewed(self):
+        item = self.create_leave()
+        self.login_as(self.admin)
+        self.assertContains(self.client.get(reverse("leave_detail", args=[item.pk])), "此申请未上传佐证材料")
+        self.client.post(reverse("leave_action", args=[item.pk, "approve"]))
+        item.refresh_from_db()
+        self.assertEqual(item.status, Leave.Status.APPROVED)
 
     def test_csrf_enforced_for_mutation(self):
         client = Client(enforce_csrf_checks=True)

@@ -46,6 +46,7 @@ urlpatterns = [
     path("leaves/export/", views.leave_export, name="leave_export"),
     path("leaves/new/", views.leave_create, name="leave_create"),
     path("leaves/<int:pk>/", views.leave_detail, name="leave_detail"),
+    path("leaves/<int:leave_pk>/files/<int:pk>/", views.leave_file, name="leave_file"),
     path("leaves/<int:pk>/actions/<str:action>/", views.leave_action, name="leave_action"),
     path("faqs/", views.faq_list, name="faq_list"),
     path("faqs/new/", views.faq_edit, name="faq_create"),
